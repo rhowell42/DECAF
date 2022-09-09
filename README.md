@@ -25,7 +25,7 @@ Add the slice and spill cuts you would like to optionally apply to `cut_helper.h
 
 ### Plotting Options
 - Only Plot Nu Slice
-  - Redraw the scene to only show slices that aren't identified by Pandora as "clear cosmic."
+  - Redraw the scene to only show slices that aren't identified by Pandora as "clear cosmic." Checking or unchecking this box will rerun the spectrum loader, so give it some time.
 - Apply Slice Cuts
   - Redraw the scene to only show slices that pass a vector of user defined slice cuts.
 - Apply Spill Cuts
