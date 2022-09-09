@@ -68,12 +68,12 @@ void Draw()
       std::vector<int> indices = findItems(SliceID[spill], target);
       for (auto &e: indices) {
         if (SliceID[spill][e] != sliceID) { continue; } 
-        //plot->SetPoint(e,X[spill][e],Z[spill][e],Y[spill][e]);
+        plot->SetPoint(e,X[spill][e],Z[spill][e],Y[spill][e]);
       }
-      //plot->SetMarkerSize(.2);
-      //plot->SetMarkerColor(1+c);
-      //plot->SetMarkerStyle(20);   
-      //plot->Draw("SAME");
+      plot->SetMarkerSize(.2);
+      plot->SetMarkerColor(1+c);
+      plot->SetMarkerStyle(20);   
+      plot->Draw("SAME");
       c++;
     }
   }
@@ -177,7 +177,6 @@ void fill_vectors()
 void event_display(const std::string inputName)
 {
   fname = inputName;
-  gStyle->SetCanvasPreferGL(kTRUE);
   new MyMainFrame();
   frame3d->SetTitle("Event Display");
   frame3d->GetXaxis()->SetTitle("X position");
