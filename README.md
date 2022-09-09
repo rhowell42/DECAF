@@ -6,6 +6,8 @@ This is a lightweight event display that runs on caf and flatcaf files from even
 
 The event display utilizes recob::Hit and recob::SpacePoint information added to the CAFs in two feature branches, both named feature/rh_SRHits, in [SBNSoftware/sbnanaobj](https://github.com/SBNSoftware/sbnanaobj/tree/feature/rh_SRHits) and [SBNSoftware/sbncode](https://github.com/SBNSoftware/sbncode/tree/feature/rh_SRHits). In order to use the event display, you will need a CAF file generated with this information added, and you will need a local build of SBNSoftware/sbnanaobj with my feature branch feature/rh_SRHits and a base local build of [SBNSoftware/sbnana](https://github.com/SBNSoftware/sbnana/tree/develop). SBNSoftware/sbnana is necessary until these changes are absorbed into the develop branch; otherwise you need the local build for sbnana/CAFAna/Core/FileReducer.cxx and some other files to be consistent with sbnanaobj.
 
+Some data events from run 7418 are available for you to check out here: `/icarus/app/users/rhowell/SRHits/test.flat.caf.root`
+
 ## How to Use
 ### Base Use
 1. On an ICARUS gpvm, go to your working area and clone this repository `git clone https://github.com/rhowell42/CAFDisplay.git`
