@@ -38,3 +38,10 @@ Add the slice and spill cuts you would like to optionally apply to `cut_helper.h
   - Draw the sequentially next spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
 - Previous Spill
   - Draw the sequentially previous spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
+
+# TODO
+- Add ability to zoom in and pan the display
+- Add color option to color based on recob::Hit ADC Integral
+- Add geometric objects to represent ICARUS detector
+  - Cathode planes
+  - Cryostat box/wire planes
