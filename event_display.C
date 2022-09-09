@@ -16,9 +16,7 @@
 
 using namespace ana;
 
-const std::string fname = "./test.flat.caf.root";
-
-
+std::string fname;
 std::string title = "3dframe";
 TH3F *frame3d = new TH3F(title.c_str(),title.c_str(),1,-400,400,1,-1000,1000,1,-200,200);  
 
@@ -176,8 +174,9 @@ void fill_vectors()
   loader.Go();
 }
 
-void event_display()
+void event_display(const std::string inputName)
 {
+  fname = inputName;
   gStyle->SetCanvasPreferGL(kTRUE);
   new MyMainFrame();
   frame3d->SetTitle("Event Display");
