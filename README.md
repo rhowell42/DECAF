@@ -20,7 +20,7 @@ N.B. You may need to run the bash command `stty sane` after closing the GUI wind
 7. Profit
 
 
-## Generate Your Own CAFs
+### Generate Your Own CAFs
 You will need your own copy of [cafmakerjob_icarus.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus.fcl) ([cafmakerjob_icarus_data.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus_data.fcl) if you want to look at data). There you will add the line `cafmaker.FillHits: true` which will fill all of the SRHit and SRSpacePoint information needed to use the event display. Then run `lar -c cafmakerjob_icarus{_data}.fcl` as usual.
 
 **WARNING: These CAF files will be an order of magnitude larger in size than the normal CAFs. 100 data events will be ~300 MB in size.**
