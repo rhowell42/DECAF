@@ -19,6 +19,12 @@ N.B. You may need to run the bash command `stty sane` after closing the GUI wind
 6. ???
 7. Profit
 
+
+## Generate Your Own CAFs
+You will need your own copy of [cafmakerjob_icarus.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus.fcl) ([cafmakerjob_icarus_data.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus_data.fcl) if you want to look at data). There you will add the line `cafmaker.FillHits: true` which will fill all of the SRHit and SRSpacePoint information needed to use the event display. Then run `lar -c cafmakerjob_icarus{_data}.fcl` as usual.
+
+**WARNING: These CAF files will be an order of magnitude larger in size than the normal CAFs. 100 data events will be ~300 MB in size for the CAF file.**
+
 ### User Cuts
 Add the slice and spill cuts you would like to optionally apply to `cut_helper.h`; there are two vectors, one for slice cuts and the other for spill cuts. Do not change the name of these vectors, but add your cuts to them in the same way the `kNoCut` are added. I would recommened adding an `#include your_cuts.h` statement to keep `cut_helper.h` visually clean, where `your_cuts.h` is where you actually define the cuts you use for you selection. 
 
@@ -41,11 +47,6 @@ Add the slice and spill cuts you would like to optionally apply to `cut_helper.h
   - Draw the sequentially next spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
 - Previous Spill
   - Draw the sequentially previous spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
-
-##Generate Your Own CAFs
-You will need your own copy of [cafmakerjob_icarus.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus.fcl) ([cafmakerjob_icarus_data.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus_data.fcl) if you want to look at data). There you will add the line `cafmaker.FillHits: true` which will fill all of the SRHit and SRSpacePoint information needed to use the event display. Then run `lar -c cafmakerjob_icarus{_data}.fcl` as usual.
-
-**WARNING:** These CAF files will be an order of magnitude larger in size than the normal CAFs. 100 data events will be ~300 MB in size for the CAF file.
 
 # TODO
 - Add ability to zoom in and pan the display
