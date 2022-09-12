@@ -4,8 +4,6 @@
 ## Introduction
 This is a lightweight event display that runs on caf and flatcaf files from events generated in the ICARUS LArTPCs. The purpose of this event display is to provide a user-friendly debugging tool for neutrino/cosmic ray analyses and reconstruction efforts. It contains a click-and-drag rotatable display, selectable drawing options, and buttons for advancing to either the next spill in the CAF file or the previous one.
 
-~~The event display utilizes recob::Hit and recob::SpacePoint information added to the CAFs in two feature branches, both named feature/rh_SRHits, in [SBNSoftware/sbnanaobj](https://github.com/SBNSoftware/sbnanaobj/tree/feature/rh_SRHits) and [SBNSoftware/sbncode](https://github.com/SBNSoftware/sbncode/tree/feature/rh_SRHits). In order to use the event display, you will need a CAF file generated with this information added, and you will need a local build of SBNSoftware/sbnanaobj with my feature branch feature/rh_SRHits and a base local build of [SBNSoftware/sbnana](https://github.com/SBNSoftware/sbnana/tree/develop). SBNSoftware/sbnana is necessary until these changes are absorbed into the develop branch; otherwise you need the local build for sbnana/CAFAna/Core/FileReducer.cxx and some other files to be consistent with sbnanaobj.~~
-
 The event display utilizes recob::Hit and recob::SpacePoint information added to the CAFs in [SBNSoftware/sbnanaobj](https://github.com/SBNSoftware/sbnanaobj/tree/develop) version v09_19_02 and [SBNSoftware/sbncode](https://github.com/SBNSoftware/sbncode/tree/develop) version v09_58_02.
 
 Some data events from run 7418 are available for you to check out here: `/icarus/app/users/rhowell/SRHits/test.flat.caf.root`
@@ -38,11 +36,16 @@ Add the slice and spill cuts you would like to optionally apply to `cut_helper.h
 - Apply Spill Cuts
   - Redraw the scene, return to the base spill of the CAF file, and only plot spills that pass a vector of user defined slice cuts.
   
-### Spill Navigation
+### Event Navigation
 - Next Spill
   - Draw the sequentially next spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
 - Previous Spill
   - Draw the sequentially previous spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
+
+##Generate Your Own CAFs
+You will need your own copy of [cafmakerjob_icarus.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus.fcl) ([cafmakerjob_icarus_data.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus_data.fcl) if you want to look at data). There you will add the line `cafmaker.FillHits: true` which will fill all of the SRHit and SRSpacePoint information needed to use the event display. Then run `lar -c cafmakerjob_icarus{_data}.fcl` as usual.
+
+**WARNING:** These CAF files will be an order of magnitude larger in size than the normal CAFs. 100 data events will be ~300 MB in size for the CAF file.
 
 # TODO
 - Add ability to zoom in and pan the display
@@ -50,3 +53,5 @@ Add the slice and spill cuts you would like to optionally apply to `cut_helper.h
 - Add geometric objects to represent ICARUS detector
   - Cathode planes
   - Cryostat box/wire planes
+
+~~The event display utilizes recob::Hit and recob::SpacePoint information added to the CAFs in two feature branches, both named feature/rh_SRHits, in [SBNSoftware/sbnanaobj](https://github.com/SBNSoftware/sbnanaobj/tree/feature/rh_SRHits) and [SBNSoftware/sbncode](https://github.com/SBNSoftware/sbncode/tree/feature/rh_SRHits). In order to use the event display, you will need a CAF file generated with this information added, and you will need a local build of SBNSoftware/sbnanaobj with my feature branch feature/rh_SRHits and a base local build of [SBNSoftware/sbnana](https://github.com/SBNSoftware/sbnana/tree/develop). SBNSoftware/sbnana is necessary until these changes are absorbed into the develop branch; otherwise you need the local build for sbnana/CAFAna/Core/FileReducer.cxx and some other files to be consistent with sbnanaobj.~~
