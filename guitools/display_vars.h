@@ -20,7 +20,7 @@
 #include "TLegend.h"
 #include "TMath.h"
 
-#include "cut_helper.h"
+#include "../cut_helper.h"
 
 using namespace ana;
 
