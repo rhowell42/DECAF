@@ -6,17 +6,18 @@ This is a lightweight event display that runs on caf and flatcaf files from even
 
 ~~The event display utilizes recob::Hit and recob::SpacePoint information added to the CAFs in two feature branches, both named feature/rh_SRHits, in [SBNSoftware/sbnanaobj](https://github.com/SBNSoftware/sbnanaobj/tree/feature/rh_SRHits) and [SBNSoftware/sbncode](https://github.com/SBNSoftware/sbncode/tree/feature/rh_SRHits). In order to use the event display, you will need a CAF file generated with this information added, and you will need a local build of SBNSoftware/sbnanaobj with my feature branch feature/rh_SRHits and a base local build of [SBNSoftware/sbnana](https://github.com/SBNSoftware/sbnana/tree/develop). SBNSoftware/sbnana is necessary until these changes are absorbed into the develop branch; otherwise you need the local build for sbnana/CAFAna/Core/FileReducer.cxx and some other files to be consistent with sbnanaobj.~~
 
-The event display utilizes recob::Hit and recob::SpacePoint information added to the CAFs in [SBNSoftware/sbnanaobj](https://github.com/SBNSoftware/sbnanaobj/tree/develop) version v09_19_02 and [SBNSoftware/sbncode](https://github.com/SBNSoftware/sbncode/tree/develop) version v09_58_02. 
+The event display utilizes recob::Hit and recob::SpacePoint information added to the CAFs in [SBNSoftware/sbnanaobj](https://github.com/SBNSoftware/sbnanaobj/tree/develop) version v09_19_02 and [SBNSoftware/sbncode](https://github.com/SBNSoftware/sbncode/tree/develop) version v09_58_02.
 
 Some data events from run 7418 are available for you to check out here: `/icarus/app/users/rhowell/SRHits/test.flat.caf.root`
 
 ## How to Use
 ### Base Use
 1. On an ICARUS gpvm, go to your working area and clone this repository `git clone https://github.com/rhowell42/CAFDisplay.git`
-2. Start your vncserver if you haven't already.
-3. In that same working area, run `cafe event_display.C {path/to/your/file.caf.root}`
-4. ???
-5. Profit
+3. Setup the relevant SBNSoftware/sbnana version `setup sbnana -v v09_58_02 -q e20:prof` N.B. You need version v09_58_02 or later
+4. Start your vncserver if you haven't already.
+5. In that same working area, run `cafe event_display.C {path/to/your/file.caf.root}`
+6. ???
+7. Profit
 
 ### User Cuts
 Add the slice and spill cuts you would like to optionally apply to `cut_helper.h`; there are two vectors, one for slice cuts and the other for spill cuts. Do not change the name of these vectors, but add your cuts to them in the same way the `kNoCut` are added. I would recommened adding an `#include your_cuts.h` statement to keep `cut_helper.h` visually clean, where `your_cuts.h` is where you actually define the cuts you use for you selection. 
