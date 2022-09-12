@@ -32,7 +32,7 @@ Add the slice and spill cuts you would like to optionally apply to `cut_helper.h
 - Color by Slice
   - Color code the SRSpacePoints based one which SRSlice they belong to.
 - Color by PFP
-  - Color code the SRSpacePoints based one which PFP they are reconstructed into
+  - Color code the SRSpacePoints based one which SRPFP they are reconstructed into
 
 ### Plotting Options
 - Only Plot Nu Slice
