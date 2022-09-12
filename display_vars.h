@@ -26,7 +26,7 @@ using namespace ana;
 
 bool useSliceCuts = false;
 bool useSpillCuts = false;
-bool onlyNuSlice = false;
+bool onlyNuSlice = true;
 
 const SpillMultiVar kTPCX([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;

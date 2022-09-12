@@ -183,6 +183,7 @@ MyMainFrame::MyMainFrame() {
    fOnlyNuSlice->SetMargins(0,0,0,0);
    fOnlyNuSlice->SetWrapLength(-1);
    fOnlyNuSlice->Connect("Clicked()","MyMainFrame",this,"CheckNuSlice()");
+   fOnlyNuSlice->SetState(kButtonDown);
    fMain->AddFrame(fOnlyNuSlice, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
    fOnlyNuSlice->MoveResize(240,400,140,17);
 
