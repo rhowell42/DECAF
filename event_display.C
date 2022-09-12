@@ -21,11 +21,13 @@ std::string title = "3dframe";
 TH3F *frame3d = new TH3F(title.c_str(),title.c_str(),1,-400,400,1,-1000,1000,1,-200,200);  
 
 bool ColorByPFPs = false;
+bool ColorByADC = false;
 bool ColorBySlice = true;
 
 std::vector<std::vector<double>> X;
 std::vector<std::vector<double>> Y;
 std::vector<std::vector<double>> Z;
+std::vector<std::vector<double>> ADC;
 
 std::vector<std::vector<double>> PFPID;
 std::vector<std::vector<double>> SliceID;
@@ -37,6 +39,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   X.push_back(kTPCX(sr));
   Y.push_back(kTPCY(sr));
   Z.push_back(kTPCZ(sr));
+  ADC.push_back(kADC(sr));
   PFPID.push_back(kPFPID(sr));
   SliceID.push_back(kSliceID(sr));
   nSpills++;
@@ -102,6 +105,18 @@ void Draw()
       c++;
     }
   }
+  else if (ColorByADC) {
+    gStyle->SetPalette(10);
+    for (unsigned int i = 0; i < X[spill].size(); i++ ) {
+      TPolyMarker3D *plot = new TPolyMarker3D(1);
+
+      plot->SetPoint(1,X[spill][i],Z[spill][i],Y[spill][i]);
+      plot->SetMarkerSize(.2);
+      plot->SetMarkerColor(ADC[spill][i]/100);
+      plot->SetMarkerStyle(20);   
+      plot->Draw("SAME");
+    }
+  }
 
   displayCanvas->Modified();
   displayCanvas->Update();
@@ -125,12 +140,21 @@ void doColorbySlice()
 {
   ColorByPFPs = false;
   ColorBySlice = true;  
+  ColorByADC = false;  
   Draw();
 }
 void doColorbyPFP()
 {
   ColorByPFPs = true;
   ColorBySlice = false;  
+  ColorByADC = false;  
+  Draw();
+}
+void doColorbyADC()
+{
+  ColorByPFPs = false;
+  ColorBySlice = false;  
+  ColorByADC = true;  
   Draw();
 }
 void doUseSliceCuts(bool pressed)

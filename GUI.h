@@ -137,7 +137,7 @@ private:
    TGMainFrame         *fMain;
    TRootEmbeddedCanvas *fRootEmbeddedCanvas;
    TGVButtonGroup      *fButtonGroup;  // Button group
-   TGRadioButton       *fRadiob[2];    // Radio buttons
+   TGRadioButton       *fRadiob[3];    // Radio buttons
    TGCheckButton       *fOnlyNuSlice;
    TGCheckButton       *fApplySlcCuts;
    TGCheckButton       *fApplySrCuts;
@@ -151,6 +151,7 @@ public:
    void PreviousSpill();
    void ColorbySlice();
    void ColorbyPFP();
+   void ColorbyADC();
    void CheckSliceCut();
    void CheckSpillCut();
    void CheckNuSlice();
@@ -173,16 +174,19 @@ MyMainFrame::MyMainFrame() {
    fRadiob[0]->Connect("Clicked()","MyMainFrame",this,"ColorbySlice()");
    fRadiob[1] = new TGRadioButton(fButtonGroup,new TGHotString("By PFP"));
    fRadiob[1]->Connect("Clicked()","MyMainFrame",this,"ColorbyPFP()");
+   fRadiob[2] = new TGRadioButton(fButtonGroup,new TGHotString("By ADC"));
+   fRadiob[2]->Connect("Clicked()","MyMainFrame",this,"ColorbyADC()");
    fMain->AddFrame(fButtonGroup,new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,1, 1, 1, 1));
    fButtonGroup->SetRadioButtonExclusive(kTRUE);
    fRadiob[0]->SetOn();
-   fButtonGroup->MoveResize(120,380,104,60);
+   fButtonGroup->MoveResize(120,370,104,70);
    
    fOnlyNuSlice = new TGCheckButton(fMain,"Only Plot Nu Slice");
    fOnlyNuSlice->SetTextJustify(36);
    fOnlyNuSlice->SetMargins(0,0,0,0);
    fOnlyNuSlice->SetWrapLength(-1);
    fOnlyNuSlice->Connect("Clicked()","MyMainFrame",this,"CheckNuSlice()");
+   fOnlyNuSlice->SetState(kButtonDown);
    fMain->AddFrame(fOnlyNuSlice, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
    fOnlyNuSlice->MoveResize(240,400,140,17);
 
@@ -257,6 +261,9 @@ void MyMainFrame::ColorbySlice() {
 }
 void MyMainFrame::ColorbyPFP() {
   doColorbyPFP(); 
+}
+void MyMainFrame::ColorbyADC() {
+  doColorbyADC(); 
 }
 void MyMainFrame::CheckSliceCut() {
   bool pressed = fApplySlcCuts->GetState() == kButtonDown;

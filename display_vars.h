@@ -26,7 +26,8 @@ using namespace ana;
 
 bool useSliceCuts = false;
 bool useSpillCuts = false;
-bool onlyNuSlice = false;
+bool onlyNuSlice = true;
+
 
 const SpillMultiVar kTPCX([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
@@ -63,6 +64,19 @@ const SpillMultiVar kTPCZ([](const caf::SRSpillProxy* sr) -> std::vector<double>
     if (!useSlice) { continue; }
     for (const auto& hit: slc.reco.hit) {
       hits.push_back(hit.spacepoint.XYZ.z);
+    }
+  }
+  return hits;
+});
+const SpillMultiVar kADC([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+  std::vector<double> hits;
+  for (const auto& slc: sr->slc) {
+    bool useSlice = true;
+    if (useSliceCuts) { for (const auto& cut : slice_cuts) { if (!cut(&slc)) { useSlice = false; break; } } }
+    if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
+    if (!useSlice) { continue; }
+    for (const auto& hit: slc.reco.hit) {
+      hits.push_back(hit.integral);
     }
   }
   return hits;
