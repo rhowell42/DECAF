@@ -10,6 +10,8 @@ The event display utilizes recob::Hit and recob::SpacePoint information added to
 
 Some data events from run 7418 are available for you to check out here: `/icarus/app/users/rhowell/SRHits/test.flat.caf.root`
 
+N.B. You may need to run the bash command `stty sane` after closing the GUI window. There's a bug with ROOT applications closing that sometimes you won't see typing or updates on the command line. This will fix that. 
+
 ## How to Use
 ### Base Use
 1. On an ICARUS gpvm, go to your working area and clone this repository `git clone https://github.com/rhowell42/CAFDisplay.git`
