@@ -40,7 +40,7 @@ Add the slice and spill cuts you would like to optionally apply to `cut_helper.h
 - Apply Slice Cuts
   - Redraw the scene to only show slices that pass a vector of user defined slice cuts.
 - Apply Spill Cuts
-  - Redraw the scene, return to the base spill of the CAF file, and only plot spills that pass a vector of user defined slice cuts.
+  - Redraw the scene, return to the base spill of the CAF file, and only plot spills that pass a vector of user defined slice cuts. This will restart the event loop and plot the first spill sequentially that passes these cuts.
   
 ### Event Navigation
 - Next Spill
