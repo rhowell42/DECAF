@@ -109,16 +109,16 @@ void Draw()
 void doAdvanceSpill()
 {
   if (spill < nSpills - 1) {
-    fill_vectors();
     spill++;
+    fill_vectors();
     Draw();
   }
 }
 void doPreviousSpill()
 {
   if (spill > 0) {
-    fill_vectors();
     spill--;
+    fill_vectors();
     Draw();
   }
 }
