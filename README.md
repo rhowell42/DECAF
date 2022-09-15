@@ -13,7 +13,8 @@ N.B. You may need to run the bash command `stty sane` after closing the GUI wind
 ## How to Use
 ### Base Use
 1. On an ICARUS gpvm, go to your working area and clone this repository `git clone https://github.com/rhowell42/CAFDisplay.git`
-3. Setup the relevant SBNSoftware/sbnana version `setup sbnana -v v09_58_02 -q e20:prof` N.B. You need version v09_58_02 or later
+3. Setup the relevant SBNSoftware/sbnana version `setup sbnana -v v09_58_02 -q e20:prof` 
+   -N.B. You need version v09_58_02 or later. `scripts/setup_online.sh` does this for you
 4. Start your vncserver if you haven't already. Instructions for doing this [here](https://sbnsoftware.github.io/sbndcode_wiki/Viewing_events_remotely_with_VNC.html) if you haven't done this before.
 5. In that same working area, run `cafe event_display.C {path/to/your/file.caf.root}`
 6. ???
@@ -22,6 +23,8 @@ N.B. You may need to run the bash command `stty sane` after closing the GUI wind
 
 ### Generate Your Own CAFs
 You will need your own copy of [cafmakerjob_icarus.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus.fcl) ([cafmakerjob_icarus_data.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus_data.fcl) if you want to look at data). There you will add the line `cafmaker.FillHits: true` which will fill all of the SRHit and SRSpacePoint information needed to use the event display. Then run `lar -c cafmakerjob_icarus{_data}.fcl` as usual.
+
+`scripts/cafmakerjob_icarus{_data}.fcl` already has these lines in them, so feel free to use those to generate the CAFs.
 
 **WARNING: These CAF files will be an order of magnitude larger in size than the normal CAFs. 100 data events will be ~300 MB in size.**
 
