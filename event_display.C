@@ -3,9 +3,9 @@
 
 #include "sbnana/CAFAna/Core/Binning.h"
 
-#include "display_vars.h"
-#include "data_funcs.h"
-#include "GUI.h"
+#include "guitools/display_vars.h"
+#include "guitools/GUI.h"
+#include "tools/data_funcs.h"
 
 #include "TFile.h"
 #include "TH2.h"
