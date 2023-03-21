@@ -128,6 +128,7 @@
 #include "TGLViewer.h"
 #include "TView3D.h"
 #include "button_functions.h"
+#include "TSystem.h"
 
 TCanvas *displayCanvas;
 
@@ -244,6 +245,7 @@ MyMainFrame::MyMainFrame() {
 
 void MyMainFrame::DoClose() {
    // Close window slot: delete this and really close the window
+   gSystem->Exec("stty sane");
    delete this;
 }
 
