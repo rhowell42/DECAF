@@ -142,6 +142,7 @@ private:
    TGCheckButton       *fOnlyNuSlice;
    TGCheckButton       *fApplySlcCuts;
    TGCheckButton       *fApplySrCuts;
+   TGStatusBar         *fEventHeader;
 
 public:
    MyMainFrame();
@@ -169,6 +170,15 @@ MyMainFrame::MyMainFrame() {
    fMain->Connect("CloseWindow()", "MyMainFrame", this, "DoClose()");
    fMain->DontCallClose(); // to avoid double deletions.
 
+   Int_t parts[] = {50,50};
+   fEventHeader = new TGStatusBar(fMain,50,10,kHorizontalFrame);
+   fEventHeader->SetParts(parts,2);
+   fMain->AddFrame(fEventHeader, new TGLayoutHints(kLHintsBottom | 
+               kLHintsLeft | kLHintsExpandX,2,2,2,2));
+   fEventHeader->MoveResize(520,400,160,17);
+   fEventHeader->SetText("Run: ",0);
+   fEventHeader->SetText("Event: ",1);
+
    fButtonGroup = new TGVButtonGroup(fMain, "Color Options");
    fRadiob[0] = new TGRadioButton(fButtonGroup,new TGHotString("By Slice"));
    fRadiob[0]->Connect("Clicked()","MyMainFrame",this,"ColorbySlice()");
@@ -194,7 +204,7 @@ MyMainFrame::MyMainFrame() {
    fApplySlcCuts->SetWrapLength(-1);
    fApplySlcCuts->Connect("Clicked()","MyMainFrame",this,"CheckSliceCut()");
    fMain->AddFrame(fApplySlcCuts, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
-   fApplySlcCuts->MoveResize(390,385,140,17);
+   fApplySlcCuts->MoveResize(390,385,110,17);
 
    fApplySrCuts = new TGCheckButton(fMain,"Apply Spill Cuts");
    fApplySrCuts->SetTextJustify(36);
@@ -202,7 +212,7 @@ MyMainFrame::MyMainFrame() {
    fApplySrCuts->SetWrapLength(-1);
    fApplySrCuts->Connect("Clicked()","MyMainFrame",this,"CheckSpillCut()");
    fMain->AddFrame(fApplySrCuts, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
-   fApplySrCuts->MoveResize(390,410,140,17);
+   fApplySrCuts->MoveResize(390,410,110,17);
 
    TGTextButton *NextSpill = new TGTextButton(fMain,"Next Spill",-1,TGTextButton::GetDefaultGC()(),TGTextButton::GetDefaultFontStruct(),kRaisedFrame);
    NextSpill->SetTextJustify(36);
@@ -251,9 +261,19 @@ void MyMainFrame::DoClose() {
 
 void MyMainFrame::AdvanceSpill() {
   doAdvanceSpill(); 
+  char s[250] = {0};
+  sprintf(s, "Run: %d",runstring);
+  fEventHeader->SetText(s,0);
+  sprintf(s, "Event: %d",eventstring);
+  fEventHeader->SetText(s,1);
 }
 void MyMainFrame::PreviousSpill() {
   doPreviousSpill(); 
+  char s[250] = {0};
+  sprintf(s, "Run: %d",runstring);
+  fEventHeader->SetText(s,0);
+  sprintf(s, "Event: %d",eventstring);
+  fEventHeader->SetText(s,1);
 }
 void MyMainFrame::ColorbySlice() {
   doColorbySlice(); 
