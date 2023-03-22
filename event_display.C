@@ -20,12 +20,13 @@
 #include "TObject.h"
 #include "TVirtualPad.h"
 #include "TAtt3D.h"
+#include "TStyle.h" 
 
 using namespace ana;
 
 std::string fname;
 std::string title = "3dframe";
-//TH3F *frame3d = new TH3F(title.c_str(),title.c_str(),1,-400,400,1,-1000,1000,1,-200,200);  
+TH3F *frame3d = new TH3F(title.c_str(),title.c_str(),1,-420.43,420.43,1,-996.1,996.1,1,-233.61,193.21);
 
 bool ColorByPFPs = false;
 bool ColorBySlice = true;
@@ -271,18 +272,8 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
 void Draw()
 {
   displayCanvas->Clear();
-  //frame3d->Draw("AH");
+  frame3d->Draw("FBBB");
   myGeom->Draw("gl");
-
-  char s[250] = {0};
-  sprintf(s, "Run: %d Event: %d",run[spill],event[spill]);
-
-  TText *t = new TText(0,.8,s);
-  t->SetTextAlign(10);
-  t->SetTextColor(kBlack);
-  t->SetTextFont(43);
-  t->SetTextSize(20);
-  t->Draw("SAME");
 
   if (ColorBySlice) {
     std::vector<double> uniqueSliceIDs = SliceID[spill];
@@ -343,6 +334,8 @@ void doAdvanceSpill()
   if (spill < nSpills - 1) {
     spill++;
     Draw();
+    runstring = run[spill];
+    eventstring = event[spill];
   }
 }
 void doPreviousSpill()
@@ -350,6 +343,8 @@ void doPreviousSpill()
   if (spill > 0) {
     spill--;
     Draw();
+    runstring = run[spill];
+    eventstring = event[spill];
   }
 }
 void doColorbySlice()
@@ -409,13 +404,14 @@ void fill_vectors()
 
 void event_display(const std::string inputName)
 {
+  //gStyle->SetCanvasPreferGL(true);
   fname = inputName;
   new MyMainFrame();
-  //frame3d->SetTitle("Event Display");
-  //frame3d->GetXaxis()->SetTitle("X position");
-  //frame3d->GetYaxis()->SetTitle("Z position");
-  //frame3d->GetZaxis()->SetTitle("Y position");
-  //frame3d->Draw("AH");
+  frame3d->SetTitle("Event Display");
+  frame3d->GetXaxis()->SetTitle("X position");
+  frame3d->GetYaxis()->SetTitle("Z position");
+  frame3d->GetZaxis()->SetTitle("Y position");
+  frame3d->Draw("FBBB");
   fill_vectors();
   Draw();
   myGeom->Draw("gl");
