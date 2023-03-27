@@ -21,6 +21,11 @@
 #include "TVirtualPad.h"
 #include "TAtt3D.h"
 #include "TStyle.h" 
+#include "TPointSet3D.h"
+#include "TPointSet3DGL.h"
+#include "TEveViewer.h"
+#include "TEveManager.h"
+#include "TGLRnrCtx.h"
 
 using namespace ana;
 
@@ -272,8 +277,9 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
 void Draw()
 {
   displayCanvas->Clear();
-  frame3d->Draw("FBBB");
-  myGeom->Draw("gl");
+  gStyle->SetCanvasPreferGL(true);
+  //frame3d->Draw();
+  myGeom->Draw("OGL");
 
   if (ColorBySlice) {
     std::vector<double> uniqueSliceIDs = SliceID[spill];
@@ -284,19 +290,21 @@ void Draw()
     int c = 0;
     for (int sliceID : uniqueSliceIDs) {
       TPolyMarker3D *plot = new TPolyMarker3D(X[spill].size());
+      TPointSet3D *marker = new TPointSet3D(X[spill].size());
       if (c == 10 || c == 19) { c++; }
 
       int target = sliceID; 
       std::vector<int> indices = findItems(SliceID[spill], target);
       for (auto &e: indices) {
         if (SliceID[spill][e] != sliceID) { continue; } 
-        plot->SetPoint(e,X[spill][e],Z[spill][e],Y[spill][e]);
+         marker->SetPoint(e,X[spill][e],Z[spill][e],Y[spill][e]);
+         marker->SetMarkerColor(1+c);
       }
-      plot->SetMarkerSize(.2);
-      plot->SetMarkerColor(1+c);
-      plot->SetMarkerStyle(20);   
-      plot->Draw("SAME");
       c++;
+      TPointSet3DGL *glrender = (TPointSet3DGL*)marker;
+      TGLViewer *viewer = (TGLViewer*)gPad->GetViewer3D();
+      glrender->DirectDraw(*viewer->GetRnrCtx());
+      //marker->Draw("OGL");
     }
   }
   else if (ColorByPFPs) {
@@ -404,15 +412,16 @@ void fill_vectors()
 
 void event_display(const std::string inputName)
 {
-  //gStyle->SetCanvasPreferGL(true);
+  gStyle->SetCanvasPreferGL(true);
+  gStyle->SetOptStat(0);
   fname = inputName;
   new MyMainFrame();
   frame3d->SetTitle("Event Display");
   frame3d->GetXaxis()->SetTitle("X position");
   frame3d->GetYaxis()->SetTitle("Z position");
   frame3d->GetZaxis()->SetTitle("Y position");
-  frame3d->Draw("FBBB");
+  //frame3d->Draw();
   fill_vectors();
+  myGeom->Draw("OGL");
   Draw();
-  myGeom->Draw("gl");
 }
