@@ -129,14 +129,27 @@
 #include "TView3D.h"
 #include "button_functions.h"
 #include "TSystem.h"
+#include "TEveViewer.h"
+#include <TEveManager.h>
 
-TCanvas *displayCanvas;
+#include <TEveViewer.h>
+#include <TGLViewer.h>
+
+#include <TEveScene.h>
+
+#include <TEveProjectionManager.h>
+#include <TEveProjectionAxes.h>
+
+#include <TEveBrowser.h>
+#include <TEveWindow.h>
+#include "TEveManager.h"
+
 
 class MyMainFrame {
    RQ_OBJECT("MyMainFrame")
 private:
    TGMainFrame         *fMain;
-   TRootEmbeddedCanvas *fRootEmbeddedCanvas;
+   TGLEmbeddedViewer   *v;
    TGVButtonGroup      *fButtonGroup;  // Button group
    TGRadioButton       *fRadiob[2];    // Radio buttons
    TGCheckButton       *fOnlyNuSlice;
@@ -159,98 +172,97 @@ public:
 };
 
 MyMainFrame::MyMainFrame() {
+   
+   TEveBrowser* browser = gEve->GetBrowser();
+   browser->StartEmbedding(TRootBrowser::kLeft);
+    
    // main frame
-   
-   
-   fMain = new TGMainFrame(gClient->GetRoot(),10,10,kMainFrame | kVerticalFrame);
-   fMain->SetName("fMain");
+   fMain = new TGMainFrame(gClient->GetRoot(),1000,600);
    fMain->SetLayoutBroken(kTRUE);
+   fMain->SetWindowName("XX GUI");
 
    fMain->SetCleanup(kDeepCleanup);
    fMain->Connect("CloseWindow()", "MyMainFrame", this, "DoClose()");
    fMain->DontCallClose(); // to avoid double deletions.
 
+   TGVerticalFrame *controls = new TGVerticalFrame(fMain,50,50);
+   
    Int_t parts[] = {50,50};
-   fEventHeader = new TGStatusBar(fMain,50,10,kHorizontalFrame);
+   fEventHeader = new TGStatusBar(controls,50,10,kHorizontalFrame);
    fEventHeader->SetParts(parts,2);
-   fMain->AddFrame(fEventHeader, new TGLayoutHints(kLHintsBottom | 
-               kLHintsLeft | kLHintsExpandX,2,2,2,2));
-   fEventHeader->MoveResize(520,400,160,17);
    fEventHeader->SetText("Run: ",0);
    fEventHeader->SetText("Event: ",1);
+   controls->AddFrame(fEventHeader, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
 
-   fButtonGroup = new TGVButtonGroup(fMain, "Color Options");
+   fButtonGroup = new TGVButtonGroup(controls, "Color Options");
    fRadiob[0] = new TGRadioButton(fButtonGroup,new TGHotString("By Slice"));
    fRadiob[0]->Connect("Clicked()","MyMainFrame",this,"ColorbySlice()");
    fRadiob[1] = new TGRadioButton(fButtonGroup,new TGHotString("By PFP"));
    fRadiob[1]->Connect("Clicked()","MyMainFrame",this,"ColorbyPFP()");
-   fMain->AddFrame(fButtonGroup,new TGLayoutHints(kLHintsCenterX | kLHintsCenterY,1, 1, 1, 1));
    fButtonGroup->SetRadioButtonExclusive(kTRUE);
    fRadiob[0]->SetOn();
-   fButtonGroup->MoveResize(120,380,104,60);
+   controls->AddFrame(fButtonGroup, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+//   fButtonGroup->MoveResize(120,380,104,60);
    
-   fOnlyNuSlice = new TGCheckButton(fMain,"Only Plot Nu Slice");
-   fOnlyNuSlice->SetTextJustify(36);
-   fOnlyNuSlice->SetMargins(0,0,0,0);
-   fOnlyNuSlice->SetWrapLength(-1);
+   fOnlyNuSlice = new TGCheckButton(controls,"Only Plot Nu Slice");
+   //fOnlyNuSlice->SetTextJustify(36);
+//   fOnlyNuSlice->SetMargins(0,0,0,0);
+   //fOnlyNuSlice->SetWrapLength(-1);
    fOnlyNuSlice->Connect("Clicked()","MyMainFrame",this,"CheckNuSlice()");
    fOnlyNuSlice->SetState(kButtonDown);
-   fMain->AddFrame(fOnlyNuSlice, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
-   fOnlyNuSlice->MoveResize(240,400,140,17);
+   controls->AddFrame(fOnlyNuSlice, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+//   fOnlyNuSlice->MoveResize(240,400,140,17);
 
-   fApplySlcCuts = new TGCheckButton(fMain,"Apply Slice Cuts");
-   fApplySlcCuts->SetTextJustify(36);
-   fApplySlcCuts->SetMargins(0,0,0,0);
-   fApplySlcCuts->SetWrapLength(-1);
+   fApplySlcCuts = new TGCheckButton(controls,"Apply Slice Cuts");
+   //fApplySlcCuts->SetTextJustify(36);
+   //fApplySlcCuts->SetMargins(0,0,0,0);
+   //fApplySlcCuts->SetWrapLength(-1);
    fApplySlcCuts->Connect("Clicked()","MyMainFrame",this,"CheckSliceCut()");
-   fMain->AddFrame(fApplySlcCuts, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
-   fApplySlcCuts->MoveResize(390,385,110,17);
+   controls->AddFrame(fApplySlcCuts, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+//   fOnlyNuSlice->MoveResize(240,400,140,17);
+//   fApplySlcCuts->MoveResize(390,385,110,17);
 
-   fApplySrCuts = new TGCheckButton(fMain,"Apply Spill Cuts");
-   fApplySrCuts->SetTextJustify(36);
-   fApplySrCuts->SetMargins(0,0,0,0);
-   fApplySrCuts->SetWrapLength(-1);
+   fApplySrCuts = new TGCheckButton(controls,"Apply Spill Cuts");
+   //fApplySrCuts->SetTextJustify(36);
+   //fApplySrCuts->SetMargins(0,0,0,0);
+   //fApplySrCuts->SetWrapLength(-1);
    fApplySrCuts->Connect("Clicked()","MyMainFrame",this,"CheckSpillCut()");
-   fMain->AddFrame(fApplySrCuts, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
-   fApplySrCuts->MoveResize(390,410,110,17);
+   controls->AddFrame(fApplySrCuts, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+//   fApplySrCuts->MoveResize(390,410,110,17);
 
-   TGTextButton *NextSpill = new TGTextButton(fMain,"Next Spill",-1,TGTextButton::GetDefaultGC()(),TGTextButton::GetDefaultFontStruct(),kRaisedFrame);
-   NextSpill->SetTextJustify(36);
-   NextSpill->SetMargins(0,0,0,0);
-   NextSpill->SetWrapLength(-1);
-   NextSpill->Resize(88,16);
+   TGTextButton *NextSpill = new TGTextButton(controls,"Next Spill");
+   //NextSpill->SetTextJustify(36);
+   //NextSpill->SetMargins(0,0,0,0);
+   //NextSpill->SetWrapLength(-1);
+   //NextSpill->Resize(88,16);
    NextSpill->Connect("Clicked()","MyMainFrame",this,"AdvanceSpill()");
-   fMain->AddFrame(NextSpill, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
-   NextSpill->MoveResize(16,385,88,16);
+   controls->AddFrame(NextSpill, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+//   NextSpill->MoveResize(16,385,88,16);
 
-   TGTextButton *PreviousSpill = new TGTextButton(fMain,"Previous Spill",-1,TGTextButton::GetDefaultGC()(),TGTextButton::GetDefaultFontStruct(),kRaisedFrame);
-   PreviousSpill->SetTextJustify(36);
-   PreviousSpill->SetMargins(0,0,0,0);
+   TGTextButton *PreviousSpill = new TGTextButton(controls,"Previous Spill");
+   //PreviousSpill->SetTextJustify(36);
+   //PreviousSpill->SetMargins(0,0,0,0);
    PreviousSpill->SetWrapLength(-1);
-   PreviousSpill->Resize(88,16);
+   ////PreviousSpill->Resize(88,16);
    PreviousSpill->Connect("Clicked()","MyMainFrame",this,"PreviousSpill()");
-   fMain->AddFrame(PreviousSpill, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
-   PreviousSpill->MoveResize(16,410,88,16);
+   controls->AddFrame(PreviousSpill, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+//   PreviousSpill->MoveResize(16,410,88,16);
+   controls->Resize(230,600);
+   fMain->AddFrame(controls);
 
-   // embedded canvas
-   fRootEmbeddedCanvas = new TRootEmbeddedCanvas(0,fMain,464,280,kSunkenFrame);
-   fRootEmbeddedCanvas->SetName("fRootEmbeddedCanvas");
-   Int_t wfRootEmbeddedCanvas = fRootEmbeddedCanvas->GetCanvasWindowId();
-
-   displayCanvas = new TCanvas("displayCanvas", 10, 10, wfRootEmbeddedCanvas);
-
-   fRootEmbeddedCanvas->AdoptCanvas(displayCanvas);
-   fMain->AddFrame(fRootEmbeddedCanvas, new TGLayoutHints(kLHintsLeft | kLHintsTop,2,2,2,2));
-   fRootEmbeddedCanvas->MoveResize(8,8,688,352);
-
-   fMain->SetMWMHints(kMWMDecorAll,
-                        kMWMFuncAll,
-                        kMWMInputModeless);
    fMain->MapSubwindows();
 
-   fMain->Resize(fMain->GetDefaultSize());
+   fMain->Resize();
    fMain->MapWindow();
-   fMain->Resize(711,437);
+   browser->StopEmbedding();
+   browser->SetTabTitle("Event Control", 0);
 }
 
 void MyMainFrame::DoClose() {
