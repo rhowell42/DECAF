@@ -91,8 +91,8 @@ void LoadHits()
     int c = 0;
     for (int sliceID : uniqueSliceIDs) {
       if (c == 10 || c == 19) { c++; }
-    auto marker = new TEvePointSet();
-    marker->SetOwnIds(kTRUE);
+      auto marker = new TEvePointSet();
+      marker->SetOwnIds(kTRUE);
 
       int target = sliceID; 
       std::vector<int> indices = findItems(SliceID[spill], target);
@@ -104,18 +104,18 @@ void LoadHits()
           marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
           marker->SetPointId(new TNamed(Form("Point %d", e), ""));
       }
-    marker->SetMarkerSize(.8);
-    marker->SetMarkerStyle(2);
-    marker->SetMainColor(1+c);
-    gEve->AddElement(marker);
-    auto top = gEve->GetCurrentEvent();
+      marker->SetMarkerSize(.8);
+      marker->SetMarkerStyle(2);
+      marker->SetMainColor(1+c);
+      gEve->AddElement(marker);
+      auto top = gEve->GetCurrentEvent();
 
-    gMultiView->DestroyEventRPhi();
-    gMultiView->ImportEventRPhi(top);
+      gMultiView->DestroyEventRPhi();
+      gMultiView->ImportEventRPhi(top);
 
-    gMultiView->DestroyEventRhoZ();
-    gMultiView->ImportEventRhoZ(top);
-    gEve->Redraw3D(kFALSE,kTRUE);
+      gMultiView->DestroyEventRhoZ();
+      gMultiView->ImportEventRhoZ(top);
+      gEve->Redraw3D(kFALSE,kTRUE);
       c++;
     }
   }
@@ -130,8 +130,8 @@ void LoadHits()
 
     for (int pfp : uniquePFPs) {
       if (c == 10 || c == 19) { c++; }
-    auto marker = new TEvePointSet();
-    marker->SetOwnIds(kTRUE);
+      auto marker = new TEvePointSet();
+      marker->SetOwnIds(kTRUE);
 
       int target = pfp; 
       std::vector<int> indices = findItems(PFPID[spill], target);
@@ -143,18 +143,18 @@ void LoadHits()
           marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
           marker->SetPointId(new TNamed(Form("Point %d", e), ""));
       }
-    marker->SetMarkerSize(.8);
-    marker->SetMarkerStyle(2);
-    marker->SetMainColor(1+c);
-    gEve->AddElement(marker);
-    auto top = gEve->GetCurrentEvent();
+      marker->SetMarkerSize(.8);
+      marker->SetMarkerStyle(2);
+      marker->SetMainColor(1+c);
+      gEve->AddElement(marker);
+      auto top = gEve->GetCurrentEvent();
 
-    gMultiView->DestroyEventRPhi();
-    gMultiView->ImportEventRPhi(top);
+      gMultiView->DestroyEventRPhi();
+      gMultiView->ImportEventRPhi(top);
 
-    gMultiView->DestroyEventRhoZ();
-    gMultiView->ImportEventRhoZ(top);
-    gEve->Redraw3D(kFALSE,kTRUE);
+      gMultiView->DestroyEventRhoZ();
+      gMultiView->ImportEventRhoZ(top);
+      gEve->Redraw3D(kFALSE,kTRUE);
       c++;
     }
   }
@@ -310,7 +310,7 @@ void event_display(const std::string inputName)
    gEve->AddGlobalElement(gentle_geom);
 
    gMultiView = new MultiView;
-//   gMultiView->f3DView->GetGLViewer()->SetStyle(TGLRnrCtx::kOutline);
+   gMultiView->f3DView->GetGLViewer()->SetStyle(TGLRnrCtx::kOutline);
 
    gMultiView->SetDepth(-10);
    gMultiView->ImportGeomRPhi(gentle_geom);
