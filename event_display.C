@@ -89,10 +89,10 @@ void LoadHits()
     uniqueSliceIDs.resize(std::distance(uniqueSliceIDs.begin(),it));
 
     int c = 0;
-    auto marker = new TEvePointSet();
-    marker->SetOwnIds(kTRUE);
     for (int sliceID : uniqueSliceIDs) {
       if (c == 10 || c == 19) { c++; }
+    auto marker = new TEvePointSet();
+    marker->SetOwnIds(kTRUE);
 
       int target = sliceID; 
       std::vector<int> indices = findItems(SliceID[spill], target);
@@ -104,11 +104,9 @@ void LoadHits()
           marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
           marker->SetPointId(new TNamed(Form("Point %d", e), ""));
       }
-      c++;
-    }
     marker->SetMarkerSize(.8);
     marker->SetMarkerStyle(2);
-    marker->SetMainColor(2);
+    marker->SetMainColor(1+c);
     gEve->AddElement(marker);
     auto top = gEve->GetCurrentEvent();
 
@@ -118,6 +116,8 @@ void LoadHits()
     gMultiView->DestroyEventRhoZ();
     gMultiView->ImportEventRhoZ(top);
     gEve->Redraw3D(kFALSE,kTRUE);
+      c++;
+    }
   }
   else if (ColorByPFPs) {
     std::vector<double> uniquePFPs = PFPID[spill];
@@ -127,32 +127,25 @@ void LoadHits()
     uniquePFPs.resize(std::distance(uniquePFPs.begin(),it));
    
     int c = 0;
-    auto marker = new TEvePointSet();
-    marker->SetOwnIds(kTRUE);
 
     for (int pfp : uniquePFPs) {
       if (c == 10 || c == 19) { c++; }
+    auto marker = new TEvePointSet();
+    marker->SetOwnIds(kTRUE);
 
       int target = pfp; 
       std::vector<int> indices = findItems(PFPID[spill], target);
       char slice[252];
       sprintf(slice,"%d",target);
-      auto marker = new TEvePointSet(slice,indices.size());
-      marker->SetOwnIds(kTRUE);
-      marker->SetElementName(slice);
-      marker->SetMarkerSize(.5);
-      marker->SetMarkerStyle(2);
 
       for (auto &e: indices) {
         if (PFPID[spill][e] != pfp) { continue; } 
           marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
           marker->SetPointId(new TNamed(Form("Point %d", e), ""));
       }
-      c++;
-    }
     marker->SetMarkerSize(.8);
     marker->SetMarkerStyle(2);
-    marker->SetMainColor(2);
+    marker->SetMainColor(1+c);
     gEve->AddElement(marker);
     auto top = gEve->GetCurrentEvent();
 
@@ -162,6 +155,8 @@ void LoadHits()
     gMultiView->DestroyEventRhoZ();
     gMultiView->ImportEventRhoZ(top);
     gEve->Redraw3D(kFALSE,kTRUE);
+      c++;
+    }
   }
   
 }
@@ -190,30 +185,35 @@ void doColorbySlice()
 {
   ColorByPFPs = false;
   ColorBySlice = true;  
+    gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
 void doColorbyPFP()
 {
   ColorByPFPs = true;
   ColorBySlice = false;  
+    gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
 void doUseSliceCuts(bool pressed)
 {
   useSliceCuts = pressed;
   GetSpectrumSelection();
+    gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
 void doUseSpillCuts(bool pressed)
 {
   useSpillCuts = pressed;
   GetSpectrumSelection();
+    gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
 void doUseNuSlice(bool pressed)
 {
   onlyNuSlice = pressed;
   GetSpectrumSelection();
+    gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
 
