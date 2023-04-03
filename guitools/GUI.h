@@ -147,7 +147,7 @@
 #include "sbnana/CAFAna/Core/Cut.h"
 //#include "sbnana/CAFAna/StandardRecord/Proxy/SRProxy.h"
 #include "sbnanaobj/StandardRecord/Proxy/SRProxy.h"
-
+#include "GUI_helper.cxx"
 
 class MyMainFrame {
    RQ_OBJECT("MyMainFrame")
@@ -162,9 +162,10 @@ private:
    TGStatusBar         *fEventHeader;
    TGListBox           *fSliceBox;
    TGListBox           *fSpillBox;
+   TList               *fSelected;
 
 public:
-   MyMainFrame(std::vector<const char*> sliceCuts, std::vector<const char*> spillCuts);
+   MyMainFrame();
    virtual ~MyMainFrame();
    void DoClose();
 
@@ -178,7 +179,7 @@ public:
    void HandleButtons();
 };
 
-MyMainFrame::MyMainFrame(std::vector<const char*> sliceCuts, std::vector<const char*> spillCuts) {
+MyMainFrame::MyMainFrame() {
    
    TEveBrowser* browser = gEve->GetBrowser();
    browser->StartEmbedding(TRootBrowser::kLeft);
@@ -242,24 +243,33 @@ MyMainFrame::MyMainFrame(std::vector<const char*> sliceCuts, std::vector<const c
    controls->AddFrame(fCutButtons);
    
    // list box widget containing 10 entries
+   fSelected = new TList;
    fSliceBox = new TGListBox(fCutBoxes, 90);
    fSliceBox->Resize(100, 80);
+   std::vector<std::string> slcCuts = SliceCuts();
    fSliceBox->SetMultipleSelections(kTRUE);
+
    int i = 0;
-   for (auto entry : sliceCuts) {
-     fSliceBox->AddEntry(entry,i);
+   for (auto entry : slcCuts) {
+     fSliceBox->AddEntry(entry.c_str(),i);
      i++;
    }
+   fSliceBox->MapSubwindows();
+   fSliceBox->Layout();
    fCutBoxes->AddFrame(fSliceBox,new TGLayoutHints(kLHintsTop|kLHintsLeft,5,5,5,10));
 
    fSpillBox = new TGListBox(fCutBoxes, 90);
    fSpillBox->Resize(100, 80);
+   std::vector<std::string> srCuts = SpillCuts();
    fSpillBox->SetMultipleSelections(kTRUE);
+
    i = 0;
-   for (auto entry : sliceCuts) {
-     fSpillBox->AddEntry(entry, i);
+   for (auto entry : srCuts) {
+     fSpillBox->AddEntry(entry.c_str(), i);
      i++;
    }
+   fSpillBox->MapSubwindows();
+   fSpillBox->Layout();
    fCutBoxes->AddFrame(fSpillBox,new TGLayoutHints(kLHintsTop|kLHintsRight,15,5,5,10));
 
    fCutBoxes->Resize(230,100);
@@ -307,11 +317,27 @@ void MyMainFrame::ColorbyPFP() {
 }
 void MyMainFrame::CheckSliceCut() {
   bool pressed = fApplySlcCuts->GetState() == kButtonDown;
-  doUseSliceCuts(pressed);
+  fSliceBox->GetSelectedEntries(fSelected);
+  TIter next(fSelected);
+  TGLBEntry *e;
+  std::vector<int> indices;
+  while ((e=(TGLBEntry*)next())) {
+    indices.push_back(e->EntryId());
+  }
+  fSelected->Clear();
+  doUseSliceCuts(pressed,indices);
 }
 void MyMainFrame::CheckSpillCut() {
   bool pressed = fApplySrCuts->GetState() == kButtonDown;
-  doUseSpillCuts(pressed);
+  fSpillBox->GetSelectedEntries(fSelected);
+  TIter next(fSelected);
+  TGLBEntry *e;
+  std::vector<int> indices;
+  while ((e=(TGLBEntry*)next())) {
+    indices.push_back(e->EntryId());
+  }
+  fSelected->Clear();
+  doUseSpillCuts(pressed,indices);
 }
 void MyMainFrame::CheckNuSlice() {
   bool pressed = fOnlyNuSlice->GetState() == kButtonDown;

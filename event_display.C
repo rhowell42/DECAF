@@ -65,6 +65,8 @@ std::vector<int> event;
 std::vector<std::vector<double>> PFPID;
 std::vector<std::vector<double>> SliceID;
 
+std::vector<int> spillCutIndices;
+
 MultiView* gMultiView = 0;
 
 int spill = 0; 
@@ -197,16 +199,18 @@ void doColorbyPFP()
   gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
-void doUseSliceCuts(bool pressed)
+void doUseSliceCuts(bool pressed, std::vector<int> cut_indices)
 {
   useSliceCuts = pressed;
+  sliceCutIndices = cut_indices;
   GetSpectrumSelection();
   gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
-void doUseSpillCuts(bool pressed)
+void doUseSpillCuts(bool pressed, std::vector<int> cut_indices)
 {
   useSpillCuts = pressed;
+  spillCutIndices = cut_indices;
   GetSpectrumSelection();
   gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
@@ -235,10 +239,8 @@ void GetSpectrumSelection()
 
   SpillCut thisCut = kNoSpillCut;
   if (useSpillCuts) {
-    int i = 0;
-    for (auto cut : spill_cuts) { 
-        thisCut = thisCut && cut;
-        i++;
+    for (auto cut : spillCutIndices) { 
+        thisCut = thisCut && spill_cuts[cut];
     }
   }
 
@@ -330,15 +332,7 @@ void event_display(const std::string inputName)
 
    gEve->GetBrowser()->GetTabRight()->SetTab(1);
 
-   std::vector<const char*> sliceCuts, spillCuts;
-   for (auto slcCut : slice_cuts) {
-     sliceCuts.push_back(GET_VARIABLE_NAME(slcCut));
-   }
-   for (auto srCut : spill_cuts) {
-     spillCuts.push_back(GET_VARIABLE_NAME(srCut));
-   }
-
-   new MyMainFrame(sliceCuts, spillCuts);
+   new MyMainFrame();
 
    gEve->AddEvent(new TEveEventManager("Event", "ICARUS CAF Event"));
    GetSpectrumSelection();
