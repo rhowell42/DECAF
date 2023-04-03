@@ -1,3 +1,5 @@
+#define GET_VARIABLE_NAME(Variable) (#Variable)
+
 #include "sbnana/CAFAna/Core/SpectrumLoader.h"
 #include "sbnana/CAFAna/Core/Spectrum.h"
 
@@ -185,35 +187,35 @@ void doColorbySlice()
 {
   ColorByPFPs = false;
   ColorBySlice = true;  
-    gEve->GetCurrentEvent()->DestroyElements();
+  gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
 void doColorbyPFP()
 {
   ColorByPFPs = true;
   ColorBySlice = false;  
-    gEve->GetCurrentEvent()->DestroyElements();
+  gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
 void doUseSliceCuts(bool pressed)
 {
   useSliceCuts = pressed;
   GetSpectrumSelection();
-    gEve->GetCurrentEvent()->DestroyElements();
+  gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
 void doUseSpillCuts(bool pressed)
 {
   useSpillCuts = pressed;
   GetSpectrumSelection();
-    gEve->GetCurrentEvent()->DestroyElements();
+  gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
 void doUseNuSlice(bool pressed)
 {
   onlyNuSlice = pressed;
   GetSpectrumSelection();
-    gEve->GetCurrentEvent()->DestroyElements();
+  gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
 
@@ -233,7 +235,11 @@ void GetSpectrumSelection()
 
   SpillCut thisCut = kNoSpillCut;
   if (useSpillCuts) {
-    for (auto cut : spill_cuts) { thisCut = thisCut && cut; }
+    int i = 0;
+    for (auto cut : spill_cuts) { 
+        thisCut = thisCut && cut;
+        i++;
+    }
   }
 
   Spectrum sFindSpill("",bins,loader,kFindEvents,thisCut,kSpillUnweighted);
@@ -306,7 +312,6 @@ void event_display(const std::string inputName)
    auto gse = (TEveGeoShapeExtract*) file->Get("Gentle");
    gentle_geom = TEveGeoShape::ImportShapeExtract(gse, 0);
    file->Close();
-   //gentle_geom->SetMainTransparency(100);
    gEve->AddGlobalElement(gentle_geom);
 
    gMultiView = new MultiView;
@@ -325,7 +330,15 @@ void event_display(const std::string inputName)
 
    gEve->GetBrowser()->GetTabRight()->SetTab(1);
 
-   MyMainFrame* main = new MyMainFrame();
+   std::vector<const char*> sliceCuts, spillCuts;
+   for (auto slcCut : slice_cuts) {
+     sliceCuts.push_back(GET_VARIABLE_NAME(slcCut));
+   }
+   for (auto srCut : spill_cuts) {
+     spillCuts.push_back(GET_VARIABLE_NAME(srCut));
+   }
+
+   new MyMainFrame(sliceCuts, spillCuts);
 
    gEve->AddEvent(new TEveEventManager("Event", "ICARUS CAF Event"));
    GetSpectrumSelection();

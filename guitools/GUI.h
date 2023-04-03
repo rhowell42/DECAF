@@ -143,22 +143,28 @@
 #include <TEveBrowser.h>
 #include <TEveWindow.h>
 #include "TEveManager.h"
+#include "sbnana/CAFAna/Core/Binning.h"
+#include "sbnana/CAFAna/Core/Cut.h"
+//#include "sbnana/CAFAna/StandardRecord/Proxy/SRProxy.h"
+#include "sbnanaobj/StandardRecord/Proxy/SRProxy.h"
 
 
 class MyMainFrame {
    RQ_OBJECT("MyMainFrame")
 private:
    TGMainFrame         *fMain;
-   TGLEmbeddedViewer   *v;
    TGVButtonGroup      *fButtonGroup;  // Button group
    TGRadioButton       *fRadiob[2];    // Radio buttons
    TGCheckButton       *fOnlyNuSlice;
-   TGCheckButton       *fApplySlcCuts;
-   TGCheckButton       *fApplySrCuts;
+   TGTextButton        *fApplySlcCuts;
+   TGTextButton        *fApplySrCuts;
+   TGCheckButton       *fRedraw;
    TGStatusBar         *fEventHeader;
+   TGListBox           *fSliceBox;
+   TGListBox           *fSpillBox;
 
 public:
-   MyMainFrame();
+   MyMainFrame(std::vector<const char*> sliceCuts, std::vector<const char*> spillCuts);
    virtual ~MyMainFrame();
    void DoClose();
 
@@ -169,9 +175,10 @@ public:
    void CheckSliceCut();
    void CheckSpillCut();
    void CheckNuSlice();
+   void HandleButtons();
 };
 
-MyMainFrame::MyMainFrame() {
+MyMainFrame::MyMainFrame(std::vector<const char*> sliceCuts, std::vector<const char*> spillCuts) {
    
    TEveBrowser* browser = gEve->GetBrowser();
    browser->StartEmbedding(TRootBrowser::kLeft);
@@ -186,6 +193,8 @@ MyMainFrame::MyMainFrame() {
    fMain->DontCallClose(); // to avoid double deletions.
 
    TGVerticalFrame *controls = new TGVerticalFrame(fMain,50,50);
+   TGHorizontalFrame *fCutButtons = new TGHorizontalFrame(controls,50,50);
+   TGHorizontalFrame *fCutBoxes = new TGHorizontalFrame(controls,50,50);
    
    Int_t parts[] = {50,50};
    fEventHeader = new TGStatusBar(controls,50,10,kHorizontalFrame);
@@ -203,58 +212,61 @@ MyMainFrame::MyMainFrame() {
    fButtonGroup->SetRadioButtonExclusive(kTRUE);
    fRadiob[0]->SetOn();
    controls->AddFrame(fButtonGroup, new TGLayoutHints(kLHintsTop|kLHintsLeft|
-                                                       kLHintsExpandX,5,5,5,10));
-//   fButtonGroup->MoveResize(120,380,104,60);
+                                                      kLHintsExpandX,5,5,5,10));
    
    fOnlyNuSlice = new TGCheckButton(controls,"Only Plot Nu Slice");
-   //fOnlyNuSlice->SetTextJustify(36);
-//   fOnlyNuSlice->SetMargins(0,0,0,0);
-   //fOnlyNuSlice->SetWrapLength(-1);
    fOnlyNuSlice->Connect("Clicked()","MyMainFrame",this,"CheckNuSlice()");
    fOnlyNuSlice->SetState(kButtonDown);
    controls->AddFrame(fOnlyNuSlice, new TGLayoutHints(kLHintsTop|kLHintsLeft|
                                                        kLHintsExpandX,5,5,5,10));
-//   fOnlyNuSlice->MoveResize(240,400,140,17);
-
-   fApplySlcCuts = new TGCheckButton(controls,"Apply Slice Cuts");
-   //fApplySlcCuts->SetTextJustify(36);
-   //fApplySlcCuts->SetMargins(0,0,0,0);
-   //fApplySlcCuts->SetWrapLength(-1);
-   fApplySlcCuts->Connect("Clicked()","MyMainFrame",this,"CheckSliceCut()");
-   controls->AddFrame(fApplySlcCuts, new TGLayoutHints(kLHintsTop|kLHintsLeft|
-                                                       kLHintsExpandX,5,5,5,10));
-//   fOnlyNuSlice->MoveResize(240,400,140,17);
-//   fApplySlcCuts->MoveResize(390,385,110,17);
-
-   fApplySrCuts = new TGCheckButton(controls,"Apply Spill Cuts");
-   //fApplySrCuts->SetTextJustify(36);
-   //fApplySrCuts->SetMargins(0,0,0,0);
-   //fApplySrCuts->SetWrapLength(-1);
-   fApplySrCuts->Connect("Clicked()","MyMainFrame",this,"CheckSpillCut()");
-   controls->AddFrame(fApplySrCuts, new TGLayoutHints(kLHintsTop|kLHintsLeft|
-                                                       kLHintsExpandX,5,5,5,10));
-//   fApplySrCuts->MoveResize(390,410,110,17);
-
    TGTextButton *NextSpill = new TGTextButton(controls,"Next Spill");
-   //NextSpill->SetTextJustify(36);
-   //NextSpill->SetMargins(0,0,0,0);
-   //NextSpill->SetWrapLength(-1);
-   //NextSpill->Resize(88,16);
    NextSpill->Connect("Clicked()","MyMainFrame",this,"AdvanceSpill()");
    controls->AddFrame(NextSpill, new TGLayoutHints(kLHintsTop|kLHintsLeft|
                                                        kLHintsExpandX,5,5,5,10));
-//   NextSpill->MoveResize(16,385,88,16);
-
    TGTextButton *PreviousSpill = new TGTextButton(controls,"Previous Spill");
-   //PreviousSpill->SetTextJustify(36);
-   //PreviousSpill->SetMargins(0,0,0,0);
    PreviousSpill->SetWrapLength(-1);
-   ////PreviousSpill->Resize(88,16);
    PreviousSpill->Connect("Clicked()","MyMainFrame",this,"PreviousSpill()");
    controls->AddFrame(PreviousSpill, new TGLayoutHints(kLHintsTop|kLHintsLeft|
                                                        kLHintsExpandX,5,5,5,10));
-//   PreviousSpill->MoveResize(16,410,88,16);
+
+   fApplySlcCuts = new TGTextButton(fCutButtons,"Apply Slice Cuts");
+   fApplySlcCuts->Resize(105, 80);
+   fApplySlcCuts->Connect("Clicked()","MyMainFrame",this,"CheckSliceCut()");
+   fCutButtons->AddFrame(fApplySlcCuts, new TGLayoutHints(kLHintsTop|kLHintsLeft,5,5,5,10));
+
+   fApplySrCuts = new TGTextButton(fCutButtons,"Apply Spill Cuts");
+   fApplySrCuts->Resize(105, 80);
+   fApplySrCuts->Connect("Clicked()","MyMainFrame",this,"CheckSpillCut()");
+   fCutButtons->AddFrame(fApplySrCuts, new TGLayoutHints(kLHintsTop|kLHintsRight,20,5,5,10));
+   fCutButtons->Resize(230,100);
+   controls->AddFrame(fCutButtons);
+   
+   // list box widget containing 10 entries
+   fSliceBox = new TGListBox(fCutBoxes, 90);
+   fSliceBox->Resize(100, 80);
+   fSliceBox->SetMultipleSelections(kTRUE);
+   int i = 0;
+   for (auto entry : sliceCuts) {
+     fSliceBox->AddEntry(entry,i);
+     i++;
+   }
+   fCutBoxes->AddFrame(fSliceBox,new TGLayoutHints(kLHintsTop|kLHintsLeft,5,5,5,10));
+
+   fSpillBox = new TGListBox(fCutBoxes, 90);
+   fSpillBox->Resize(100, 80);
+   fSpillBox->SetMultipleSelections(kTRUE);
+   i = 0;
+   for (auto entry : sliceCuts) {
+     fSpillBox->AddEntry(entry, i);
+     i++;
+   }
+   fCutBoxes->AddFrame(fSpillBox,new TGLayoutHints(kLHintsTop|kLHintsRight,15,5,5,10));
+
+   fCutBoxes->Resize(230,100);
+   controls->AddFrame(fCutBoxes);
+
    controls->Resize(230,600);
+
    fMain->AddFrame(controls);
 
    fMain->MapSubwindows();
