@@ -14,6 +14,7 @@ Some data events from run 7418 are available for you to check out here: `/icarus
 3. Setup the relevant SBNSoftware/sbnana version `setup sbnana -v v09_58_02 -q e20:prof` 
    -N.B. You need version v09_58_02 or later. `scripts/setup_online.sh` does this for you
 4. Start your vncserver if you haven't already. Instructions for doing this [here](https://sbnsoftware.github.io/sbndcode_wiki/Viewing_events_remotely_with_VNC.html) if you haven't done this before.
+5. Add any slice and/or spill cuts you might want to select in the respective vectors in `cut_helper.h`
 5. In that same working area, run `cafe event_display.C {path/to/your/file.caf.root}`
 6. ???
 7. Profit
