@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 
-void fill_vectors();
+void GetSpectrumSelection();
 
 template<typename T>
 std::vector<int> findItems(std::vector<T> const &v, int target) {
