@@ -267,6 +267,16 @@ void event_display(const std::string inputName)
    geom->SetTopVolume(Phy_Building);
    geom->SetTopVisible(0);
 
+   Double_t cryoPosX = 210.215;
+   //Double_t cryoPosY = -189.583+164.583;
+   //Double_t cryoPosZ = -153.683+158.783;
+   Double_t cryoPosY = 0;
+   Double_t cryoPosZ = 0;
+   Double_t tpcPosX = 74.745;
+   //Double_t tpcPosY = -492.475;
+   //Double_t tpcPosZ = -3.25;
+   Double_t tpcPosY = 0;
+   Double_t tpcPosZ = 0;
    Double_t cryo_halfX = 400.43/2;
    Double_t cryo_halfY = 1992.90/2;
    Double_t cryo_halfZ = 426.82/2;
@@ -278,17 +288,17 @@ void event_display(const std::string inputName)
    CRYO->SetLineColor(18);
    CRYO->SetLineWidth(2);
    CRYO->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(CRYO,1,new TGeoTranslation(-220.215, 0, -155.1+134.9));
-   Phy_Building->AddNodeOverlap(CRYO,2,new TGeoTranslation( 220.215, 0, -155.1+134.9));
+   Phy_Building->AddNodeOverlap(CRYO,1,new TGeoTranslation(-cryoPosX, cryoPosZ, cryoPosY));
+   Phy_Building->AddNodeOverlap(CRYO,2,new TGeoTranslation( cryoPosX, cryoPosZ, cryoPosY));
 
    TGeoVolume *TPC = geom->MakeBox("TPC", Iron, tpc_halfX, tpc_halfZ, tpc_halfY);;
    TPC->SetLineColor(18);
    TPC->SetLineWidth(2);
    TPC->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(TPC,1,new TGeoTranslation(-220.215-74.745, 0, -155.1+134.9+3.25));
-   Phy_Building->AddNodeOverlap(TPC,2,new TGeoTranslation(-220.215+74.745, 0, -155.1+134.9+3.25));
-   Phy_Building->AddNodeOverlap(TPC,3,new TGeoTranslation( 220.215-74.745, 0, -155.1+134.9+3.25));
-   Phy_Building->AddNodeOverlap(TPC,4,new TGeoTranslation( 220.215+74.745, 0, -155.1+134.9+3.25));
+   Phy_Building->AddNodeOverlap(TPC,1,new TGeoTranslation(-cryoPosX-tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
+   Phy_Building->AddNodeOverlap(TPC,2,new TGeoTranslation(-cryoPosX+tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
+   Phy_Building->AddNodeOverlap(TPC,3,new TGeoTranslation( cryoPosX-tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
+   Phy_Building->AddNodeOverlap(TPC,4,new TGeoTranslation( cryoPosX+tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
 
    TEveManager::Create();
 
