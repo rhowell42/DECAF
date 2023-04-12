@@ -55,15 +55,20 @@ std::string fname;
 bool ColorByPFPs = false;
 bool ColorBySlice = true;
 
+bool DrawPlane1 = true;
+bool DrawPlane2 = true;
+bool DrawPlane3 = true;
+
 std::vector<std::vector<double>> X;
 std::vector<std::vector<double>> Y;
 std::vector<std::vector<double>> Z;
 
-std::vector<int> run;
-std::vector<int> event;
-
 std::vector<std::vector<double>> PFPID;
 std::vector<std::vector<double>> SliceID;
+std::vector<std::vector<double>> PlaneID;
+
+std::vector<int> run;
+std::vector<int> event;
 
 std::vector<double> plotvars;
 const int x = 0;
@@ -71,7 +76,8 @@ const int y = 1;
 const int z = 2;
 const int kpfp = 3;
 const int kslice = 4;
-const int kEnd = 5;
+const int kplaneid = 5;
+const int kEnd = 6;
 
 std::vector<int> spillCutIndices;
 
@@ -89,6 +95,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   std::vector<double> zarray;
   std::vector<double> pfparray;
   std::vector<double> slicearray;
+  std::vector<double> planeidarray;
 
   for (size_t i = 0; i<plotvars.size()-kEnd; i+=kEnd) {
     xarray.push_back(plotvars[i+x]);
@@ -96,6 +103,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
     zarray.push_back(plotvars[i+z]);
     pfparray.push_back(plotvars[i+kpfp]);
     slicearray.push_back(plotvars[i+kslice]);
+    planeidarray.push_back(plotvars[i+kplaneid]);
   }
 
   X.push_back(xarray);
@@ -103,6 +111,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   Z.push_back(zarray);
   PFPID.push_back(pfparray);
   SliceID.push_back(slicearray);
+  PlaneID.push_back(planeidarray);
 
   run.push_back(kRun(sr));
   event.push_back(kEvt(sr));
@@ -133,8 +142,13 @@ void LoadHits()
 
       for (auto &e: indices) {
         if (SliceID[spill][e] != sliceID) { continue; } 
-          marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
-          marker->SetPointId(new TNamed(Form("Point %d", e), ""));
+
+        if (!DrawPlane1 && PlaneID[spill][e] == 0) { continue; } 
+        if (!DrawPlane2 && PlaneID[spill][e] == 1) { continue; } 
+        if (!DrawPlane3 && PlaneID[spill][e] == 2) { continue; } 
+
+        marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
+        marker->SetPointId(new TNamed(Form("Point %d", e), ""));
       }
       marker->SetMarkerSize(.4);
       marker->SetMarkerStyle(8);
@@ -171,9 +185,14 @@ void LoadHits()
       sprintf(slice,"%d",target);
 
       for (auto &e: indices) {
-        if (PFPID[spill][e] != pfp) { continue; } 
-          marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
-          marker->SetPointId(new TNamed(Form("Point %d", e), ""));
+        if (PFPID[spill][e] != pfp) { continue; }
+
+        if (!DrawPlane1 && PlaneID[spill][e] == 1) { continue; } 
+        if (!DrawPlane2 && PlaneID[spill][e] == 2) { continue; } 
+        if (!DrawPlane3 && PlaneID[spill][e] == 3) { continue; } 
+
+        marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
+        marker->SetPointId(new TNamed(Form("Point %d", e), ""));
       }
       marker->SetMarkerSize(.4);
       marker->SetMarkerStyle(8);
@@ -247,6 +266,24 @@ void doUseNuSlice(bool pressed)
 {
   onlyNuSlice = pressed;
   GetSpectrumSelection();
+  gEve->GetCurrentEvent()->DestroyElements();
+  LoadHits();
+}
+void doDrawPlane1(bool pressed)
+{
+  DrawPlane1 = pressed;
+  gEve->GetCurrentEvent()->DestroyElements();
+  LoadHits();
+}
+void doDrawPlane2(bool pressed)
+{
+  DrawPlane2 = pressed;
+  gEve->GetCurrentEvent()->DestroyElements();
+  LoadHits();
+}
+void doDrawPlane3(bool pressed)
+{
+  DrawPlane3 = pressed;
   gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }

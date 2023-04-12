@@ -156,6 +156,9 @@ private:
    TGVButtonGroup      *fButtonGroup;  // Button group
    TGRadioButton       *fRadiob[2];    // Radio buttons
    TGCheckButton       *fOnlyNuSlice;
+   TGCheckButton       *fCheckPlane1;
+   TGCheckButton       *fCheckPlane2;
+   TGCheckButton       *fCheckPlane3;
    TGTextButton        *fApplySlcCuts;
    TGTextButton        *fApplySrCuts;
    TGCheckButton       *fRedraw;
@@ -176,6 +179,9 @@ public:
    void CheckSliceCut();
    void CheckSpillCut();
    void CheckNuSlice();
+   void CheckPlane1();
+   void CheckPlane2();
+   void CheckPlane3();
    void HandleButtons();
 };
 
@@ -220,6 +226,25 @@ MyMainFrame::MyMainFrame() {
    fOnlyNuSlice->SetState(kButtonDown);
    controls->AddFrame(fOnlyNuSlice, new TGLayoutHints(kLHintsTop|kLHintsLeft|
                                                        kLHintsExpandX,5,5,5,10));
+
+   fCheckPlane1 = new TGCheckButton(controls,"Draw Plane 1");
+   fCheckPlane1->Connect("Clicked()","MyMainFrame",this,"CheckPlane1()");
+   fCheckPlane1->SetState(kButtonDown);
+   controls->AddFrame(fCheckPlane1, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+
+   fCheckPlane2 = new TGCheckButton(controls,"Draw Plane 2");
+   fCheckPlane2->Connect("Clicked()","MyMainFrame",this,"CheckPlane2()");
+   fCheckPlane2->SetState(kButtonDown);
+   controls->AddFrame(fCheckPlane2, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+
+   fCheckPlane3 = new TGCheckButton(controls,"Draw Plane 3");
+   fCheckPlane3->Connect("Clicked()","MyMainFrame",this,"CheckPlane3()");
+   fCheckPlane3->SetState(kButtonDown);
+   controls->AddFrame(fCheckPlane3, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+
    TGTextButton *NextSpill = new TGTextButton(controls,"Next Spill");
    NextSpill->Connect("Clicked()","MyMainFrame",this,"AdvanceSpill()");
    controls->AddFrame(NextSpill, new TGLayoutHints(kLHintsTop|kLHintsLeft|
@@ -342,6 +367,18 @@ void MyMainFrame::CheckSpillCut() {
 void MyMainFrame::CheckNuSlice() {
   bool pressed = fOnlyNuSlice->GetState() == kButtonDown;
   doUseNuSlice(pressed);
+}
+void MyMainFrame::CheckPlane1() {
+  bool pressed = fCheckPlane1->GetState() == kButtonDown;
+  doDrawPlane1(pressed);
+}
+void MyMainFrame::CheckPlane2() {
+  bool pressed = fCheckPlane2->GetState() == kButtonDown;
+  doDrawPlane2(pressed);
+}
+void MyMainFrame::CheckPlane3() {
+  bool pressed = fCheckPlane3->GetState() == kButtonDown;
+  doDrawPlane3(pressed);
 }
 
 MyMainFrame::~MyMainFrame() {

@@ -44,6 +44,7 @@ const SpillMultiVar kVARS([](const caf::SRSpillProxy* sr) -> std::vector<double>
       hits.push_back(hit.spacepoint.XYZ.z);
       hits.push_back(hit.spacepoint.pfpID);
       hits.push_back(sliceID);
+      hits.push_back(hit.planeID);
     }
     sliceID++;
   }
