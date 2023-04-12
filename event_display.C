@@ -65,7 +65,16 @@ std::vector<int> event;
 std::vector<std::vector<double>> PFPID;
 std::vector<std::vector<double>> SliceID;
 
+std::vector<double> plotvars;
+const int x = 0;
+const int y = 1;
+const int z = 2;
+const int kpfp = 3;
+const int kslice = 4;
+const int kEnd = 5;
+
 std::vector<int> spillCutIndices;
+
 
 MultiView* gMultiView = 0;
 
@@ -73,14 +82,33 @@ int spill = 0;
 int nSpills = 0;
 
 const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
-  X.push_back(kTPCX(sr));
-  Y.push_back(kTPCY(sr));
-  Z.push_back(kTPCZ(sr));
-  PFPID.push_back(kPFPID(sr));
-  SliceID.push_back(kSliceID(sr));
+  plotvars = kVARS(sr);
+
+  std::vector<double> xarray;
+  std::vector<double> yarray;
+  std::vector<double> zarray;
+  std::vector<double> pfparray;
+  std::vector<double> slicearray;
+
+  for (size_t i = 0; i<plotvars.size()-kEnd; i+=kEnd) {
+    xarray.push_back(plotvars[i+x]);
+    yarray.push_back(plotvars[i+y]);
+    zarray.push_back(plotvars[i+z]);
+    pfparray.push_back(plotvars[i+kpfp]);
+    slicearray.push_back(plotvars[i+kslice]);
+  }
+
+  X.push_back(xarray);
+  Y.push_back(yarray);
+  Z.push_back(zarray);
+  PFPID.push_back(pfparray);
+  SliceID.push_back(slicearray);
+
   run.push_back(kRun(sr));
   event.push_back(kEvt(sr));
+
   nSpills++;
+  
   return 42;
 });
 
@@ -108,8 +136,8 @@ void LoadHits()
           marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
           marker->SetPointId(new TNamed(Form("Point %d", e), ""));
       }
-      marker->SetMarkerSize(.8);
-      marker->SetMarkerStyle(2);
+      marker->SetMarkerSize(.4);
+      marker->SetMarkerStyle(8);
       marker->SetMainColor(1+c);
       gEve->AddElement(marker);
       auto top = gEve->GetCurrentEvent();
@@ -147,8 +175,8 @@ void LoadHits()
           marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
           marker->SetPointId(new TNamed(Form("Point %d", e), ""));
       }
-      marker->SetMarkerSize(.8);
-      marker->SetMarkerStyle(2);
+      marker->SetMarkerSize(.4);
+      marker->SetMarkerStyle(8);
       marker->SetMainColor(1+c);
       gEve->AddElement(marker);
       auto top = gEve->GetCurrentEvent();
@@ -269,14 +297,14 @@ void event_display(const std::string inputName)
 
    Double_t cryoPosX = 210.215;
    //Double_t cryoPosY = -189.583+164.583;
-   //Double_t cryoPosZ = -153.683+158.783;
+   Double_t cryoPosZ = 133.483-153.683;
    Double_t cryoPosY = 0;
-   Double_t cryoPosZ = 0;
+   //Double_t cryoPosZ = 0;
    Double_t tpcPosX = 74.745;
    //Double_t tpcPosY = -492.475;
-   //Double_t tpcPosZ = -3.25;
+   Double_t tpcPosZ = -3.25;
    Double_t tpcPosY = 0;
-   Double_t tpcPosZ = 0;
+   //Double_t tpcPosZ = 0;
    Double_t cryo_halfX = 400.43/2;
    Double_t cryo_halfY = 1992.90/2;
    Double_t cryo_halfZ = 426.82/2;
