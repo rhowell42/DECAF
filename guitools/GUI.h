@@ -156,6 +156,7 @@ private:
    TGVButtonGroup      *fButtonGroup;  // Button group
    TGRadioButton       *fRadiob[2];    // Radio buttons
    TGCheckButton       *fOnlyNuSlice;
+   TGCheckButton       *fCRTHits;
    TGCheckButton       *fCheckPlane1;
    TGCheckButton       *fCheckPlane2;
    TGCheckButton       *fCheckPlane3;
@@ -176,6 +177,7 @@ public:
    void PreviousSpill();
    void ColorbySlice();
    void ColorbyPFP();
+   void DrawCRTHits();
    void CheckSliceCut();
    void CheckSpillCut();
    void CheckNuSlice();
@@ -226,6 +228,13 @@ MyMainFrame::MyMainFrame() {
    fOnlyNuSlice->SetState(kButtonDown);
    controls->AddFrame(fOnlyNuSlice, new TGLayoutHints(kLHintsTop|kLHintsLeft|
                                                        kLHintsExpandX,5,5,5,10));
+
+   fCRTHits = new TGCheckButton(controls,"Plot CRT Hits");
+   fCRTHits->Connect("Clicked()","MyMainFrame",this,"DrawCRTHits()");
+   //fCRTHits->SetState(kButtonDown);
+   controls->AddFrame(fCRTHits, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+
    TGVButtonGroup *fhits = new TGVButtonGroup(controls, "Draw Hit Options");
    fCheckPlane1 = new TGCheckButton(fhits,"Induction 1");
    fCheckPlane1->Connect("Clicked()","MyMainFrame",this,"CheckPlane1()");
@@ -363,6 +372,10 @@ void MyMainFrame::CheckSpillCut() {
 void MyMainFrame::CheckNuSlice() {
   bool pressed = fOnlyNuSlice->GetState() == kButtonDown;
   doUseNuSlice(pressed);
+}
+void MyMainFrame::DrawCRTHits() {
+  bool pressed = fCRTHits->GetState() == kButtonDown;
+  doDrawCRTHits(pressed); 
 }
 void MyMainFrame::CheckPlane1() {
   bool pressed = fCheckPlane1->GetState() == kButtonDown;
