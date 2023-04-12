@@ -30,59 +30,7 @@ bool onlyNuSlice = true;
 
 std::vector<int> sliceCutIndices;
 
-const SpillMultiVar kTPCX([](const caf::SRSpillProxy* sr) -> std::vector<double> {
-  std::vector<double> hits;
-  for (const auto& slc: sr->slc) {
-    bool useSlice = true;
-    if (useSliceCuts) { for (const auto& cut : sliceCutIndices) { if (!slice_cuts[cut](&slc)) { useSlice = false; break; } } }
-    if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
-    if (!useSlice) { continue; }
-    for (const auto& hit: slc.reco.hit) {
-      hits.push_back(hit.spacepoint.XYZ.x);
-    }
-  }
-  return hits;
-});
-const SpillMultiVar kTPCY([](const caf::SRSpillProxy* sr) -> std::vector<double> {
-  std::vector<double> hits;
-  for (const auto& slc: sr->slc) {
-    bool useSlice = true;
-    if (useSliceCuts) { for (const auto& cut : sliceCutIndices) { if (!slice_cuts[cut](&slc)) { useSlice = false; break; } } }
-    if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
-    if (!useSlice) { continue; }
-    for (const auto& hit: slc.reco.hit) {
-      hits.push_back(hit.spacepoint.XYZ.y);
-    }
-  }
-  return hits;
-});
-const SpillMultiVar kTPCZ([](const caf::SRSpillProxy* sr) -> std::vector<double> {
-  std::vector<double> hits;
-  for (const auto& slc: sr->slc) {
-    bool useSlice = true;
-    if (useSliceCuts) { for (const auto& cut : sliceCutIndices) { if (!slice_cuts[cut](&slc)) { useSlice = false; break; } } }
-    if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
-    if (!useSlice) { continue; }
-    for (const auto& hit: slc.reco.hit) {
-      hits.push_back(hit.spacepoint.XYZ.z);
-    }
-  }
-  return hits;
-});
-const SpillMultiVar kPFPID([](const caf::SRSpillProxy* sr) -> std::vector<double> {
-  std::vector<double> hits;
-  for (const auto& slc: sr->slc) {
-    bool useSlice = true;
-    if (useSliceCuts) { for (const auto& cut : sliceCutIndices) { if (!slice_cuts[cut](&slc)) { useSlice = false; break; } } }
-    if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
-    if (!useSlice) { continue; }
-    for (const auto& hit: slc.reco.hit) {
-      hits.push_back(hit.spacepoint.pfpID);
-    }
-  }
-  return hits;
-});
-const SpillMultiVar kSliceID([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+const SpillMultiVar kVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   int sliceID = 0;
   for (const auto& slc: sr->slc) {
@@ -91,10 +39,13 @@ const SpillMultiVar kSliceID([](const caf::SRSpillProxy* sr) -> std::vector<doub
     if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
     if (!useSlice) { continue; }
     for (const auto& hit: slc.reco.hit) {
+      hits.push_back(hit.spacepoint.XYZ.x);
+      hits.push_back(hit.spacepoint.XYZ.y);
+      hits.push_back(hit.spacepoint.XYZ.z);
+      hits.push_back(hit.spacepoint.pfpID);
       hits.push_back(sliceID);
     }
     sliceID++;
   }
   return hits;
 });
-
