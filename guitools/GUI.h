@@ -226,23 +226,19 @@ MyMainFrame::MyMainFrame() {
    fOnlyNuSlice->SetState(kButtonDown);
    controls->AddFrame(fOnlyNuSlice, new TGLayoutHints(kLHintsTop|kLHintsLeft|
                                                        kLHintsExpandX,5,5,5,10));
-
-   fCheckPlane1 = new TGCheckButton(controls,"Draw Plane 1 Hits");
+   TGVButtonGroup *fhits = new TGVButtonGroup(controls, "Draw Hit Options");
+   fCheckPlane1 = new TGCheckButton(fhits,"Induction 1");
    fCheckPlane1->Connect("Clicked()","MyMainFrame",this,"CheckPlane1()");
    fCheckPlane1->SetState(kButtonDown);
-   controls->AddFrame(fCheckPlane1, new TGLayoutHints(kLHintsTop|kLHintsLeft|
-                                                       kLHintsExpandX,5,5,5,10));
 
-   fCheckPlane2 = new TGCheckButton(controls,"Draw Plane 2 Hits");
+   fCheckPlane2 = new TGCheckButton(fhits,"Induction 2");
    fCheckPlane2->Connect("Clicked()","MyMainFrame",this,"CheckPlane2()");
    fCheckPlane2->SetState(kButtonDown);
-   controls->AddFrame(fCheckPlane2, new TGLayoutHints(kLHintsTop|kLHintsLeft|
-                                                       kLHintsExpandX,5,5,5,10));
 
-   fCheckPlane3 = new TGCheckButton(controls,"Draw Plane 3 Hits");
+   fCheckPlane3 = new TGCheckButton(fhits,"Collection");
    fCheckPlane3->Connect("Clicked()","MyMainFrame",this,"CheckPlane3()");
    fCheckPlane3->SetState(kButtonDown);
-   controls->AddFrame(fCheckPlane3, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+   controls->AddFrame(fhits, new TGLayoutHints(kLHintsTop|kLHintsLeft|
                                                        kLHintsExpandX,5,5,5,10));
 
    TGTextButton *NextSpill = new TGTextButton(controls,"Next Spill");
