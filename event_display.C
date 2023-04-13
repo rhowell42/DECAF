@@ -113,6 +113,10 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   std::vector<double> slicearray;
   std::vector<double> planeidarray;
 
+  if (slcvars.empty()) {
+    return 42;
+  }
+
   for (size_t i = 0; i<slcvars.size()-kSlcEnd; i+=kSlcEnd) {
     xarray.push_back(slcvars[i+x]);
     yarray.push_back(slcvars[i+y]);
@@ -120,7 +124,6 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
     pfparray.push_back(slcvars[i+kpfp]);
     slicearray.push_back(slcvars[i+kslice]);
     planeidarray.push_back(slcvars[i+kplaneid]);
-  }
 
   X.push_back(xarray);
   Y.push_back(yarray);
@@ -153,12 +156,21 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   event.push_back(kEvt(sr));
 
   nSpills++;
-  
+
   return 42;
 });
 
 void LoadHits()
 {
+  if (SliceID.empty()) {
+      gMultiView->DestroyEventRPhi();
+
+      gMultiView->DestroyEventRhoZ();
+      gEve->Redraw3D(kFALSE,kTRUE);
+
+    return;
+  }
+
   if (PlotCRTHits) {
     auto marker = new TEvePointSet();
     marker->SetOwnIds(kTRUE);
@@ -178,7 +190,6 @@ void LoadHits()
     gMultiView->DestroyEventRhoZ();
     gMultiView->ImportEventRhoZ(top);
     gEve->Redraw3D(kFALSE,kTRUE);
-  }
 
   if (ColorBySlice) {
     std::vector<double> uniqueSliceIDs = SliceID[spill];
@@ -311,15 +322,15 @@ void doDrawCRTHits(bool pressed)
 }
 void doUseSliceCuts(bool pressed, std::vector<int> cut_indices)
 {
-  useSliceCuts = pressed;
+  useSliceCuts = true;
   sliceCutIndices = cut_indices;
   GetSpectrumSelection();
   gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
-void doUseSpillCuts(bool pressed, std::vector<int> cut_indices)
+void doUseSpillCuts(std::vector<int> cut_indices)
 {
-  useSpillCuts = pressed;
+  useSpillCuts = true;
   spillCutIndices = cut_indices;
   GetSpectrumSelection();
   gEve->GetCurrentEvent()->DestroyElements();
@@ -371,7 +382,7 @@ void GetSpectrumSelection()
   nSpills = 0;
   SpectrumLoader loader(fname);
 
-  const Binning bins = Binning::Simple(100, 0, 5000);
+  const Binning bins = Binning::Simple(1, 0, 1);
 
   SpillCut thisCut = kNoSpillCut;
   if (useSpillCuts) {

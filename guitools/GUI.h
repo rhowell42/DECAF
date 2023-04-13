@@ -346,7 +346,6 @@ void MyMainFrame::ColorbyPFP() {
   doColorbyPFP(); 
 }
 void MyMainFrame::CheckSliceCut() {
-  bool pressed = fApplySlcCuts->GetState() == kButtonDown;
   fSliceBox->GetSelectedEntries(fSelected);
   TIter next(fSelected);
   TGLBEntry *e;
@@ -355,10 +354,9 @@ void MyMainFrame::CheckSliceCut() {
     indices.push_back(e->EntryId());
   }
   fSelected->Clear();
-  doUseSliceCuts(pressed,indices);
+  doUseSliceCuts(indices);
 }
 void MyMainFrame::CheckSpillCut() {
-  bool pressed = fApplySrCuts->GetState() == kButtonDown;
   fSpillBox->GetSelectedEntries(fSelected);
   TIter next(fSelected);
   TGLBEntry *e;
@@ -367,7 +365,7 @@ void MyMainFrame::CheckSpillCut() {
     indices.push_back(e->EntryId());
   }
   fSelected->Clear();
-  doUseSpillCuts(pressed,indices);
+  doUseSpillCuts(indices);
 }
 void MyMainFrame::CheckNuSlice() {
   bool pressed = fOnlyNuSlice->GetState() == kButtonDown;
