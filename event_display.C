@@ -113,7 +113,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   std::vector<double> slicearray;
   std::vector<double> planeidarray;
 
-  if (slcvars.empty()) {
+  if (slcvars.empty() || srvars.empty()) {
     return 42;
   }
 
@@ -124,6 +124,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
     pfparray.push_back(slcvars[i+kpfp]);
     slicearray.push_back(slcvars[i+kslice]);
     planeidarray.push_back(slcvars[i+kplaneid]);
+  }
 
   X.push_back(xarray);
   Y.push_back(yarray);
@@ -162,7 +163,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
 
 void LoadHits()
 {
-  if (SliceID.empty()) {
+  if (SliceID.empty() || CRTX.empty()) {
       gMultiView->DestroyEventRPhi();
 
       gMultiView->DestroyEventRhoZ();
@@ -190,6 +191,7 @@ void LoadHits()
     gMultiView->DestroyEventRhoZ();
     gMultiView->ImportEventRhoZ(top);
     gEve->Redraw3D(kFALSE,kTRUE);
+  }
 
   if (ColorBySlice) {
     std::vector<double> uniqueSliceIDs = SliceID[spill];
@@ -320,7 +322,7 @@ void doDrawCRTHits(bool pressed)
   gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
-void doUseSliceCuts(bool pressed, std::vector<int> cut_indices)
+void doUseSliceCuts(std::vector<int> cut_indices)
 {
   useSliceCuts = true;
   sliceCutIndices = cut_indices;
