@@ -5,8 +5,8 @@ void doUpdateStatusBar();
 void doColorbySlice();
 void doColorbyPFP();
 
-void doUseSliceCuts(bool use, std::vector<int> cut_indices);
-void doUseSpillCuts(bool use, std::vector<int> cut_indices);
+void doUseSliceCuts(std::vector<int> cut_indices);
+void doUseSpillCuts(std::vector<int> cut_indices);
 void doUseNuSlice(bool use);
 void doDrawPlane1(bool use);
 void doDrawPlane2(bool use);

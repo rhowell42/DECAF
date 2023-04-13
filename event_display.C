@@ -97,14 +97,18 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   std::vector<double> slicearray;
   std::vector<double> planeidarray;
 
-  for (size_t i = 0; i<plotvars.size()-kEnd; i+=kEnd) {
-    xarray.push_back(plotvars[i+x]);
-    yarray.push_back(plotvars[i+y]);
-    zarray.push_back(plotvars[i+z]);
-    pfparray.push_back(plotvars[i+kpfp]);
-    slicearray.push_back(plotvars[i+kslice]);
-    planeidarray.push_back(plotvars[i+kplaneid]);
+  if (plotvars.empty()) {
+    return 42;
   }
+
+    for (size_t i = 0; i<plotvars.size()-kEnd; i+=kEnd) {
+      xarray.push_back(plotvars[i+x]);
+      yarray.push_back(plotvars[i+y]);
+      zarray.push_back(plotvars[i+z]);
+      pfparray.push_back(plotvars[i+kpfp]);
+      slicearray.push_back(plotvars[i+kslice]);
+      planeidarray.push_back(plotvars[i+kplaneid]);
+    }  
 
   X.push_back(xarray);
   Y.push_back(yarray);
@@ -117,12 +121,21 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   event.push_back(kEvt(sr));
 
   nSpills++;
-  
+
   return 42;
 });
 
 void LoadHits()
 {
+  if (SliceID.empty()) {
+      gMultiView->DestroyEventRPhi();
+
+      gMultiView->DestroyEventRhoZ();
+      gEve->Redraw3D(kFALSE,kTRUE);
+
+    return;
+  }
+
   if (ColorBySlice) {
     std::vector<double> uniqueSliceIDs = SliceID[spill];
     std::vector<double>::iterator it;
@@ -246,17 +259,17 @@ void doColorbyPFP()
   gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
-void doUseSliceCuts(bool pressed, std::vector<int> cut_indices)
+void doUseSliceCuts(std::vector<int> cut_indices)
 {
-  useSliceCuts = pressed;
+  useSliceCuts = true;
   sliceCutIndices = cut_indices;
   GetSpectrumSelection();
   gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
-void doUseSpillCuts(bool pressed, std::vector<int> cut_indices)
+void doUseSpillCuts(std::vector<int> cut_indices)
 {
-  useSpillCuts = pressed;
+  useSpillCuts = true;
   spillCutIndices = cut_indices;
   GetSpectrumSelection();
   gEve->GetCurrentEvent()->DestroyElements();
@@ -295,12 +308,13 @@ void GetSpectrumSelection()
   Z.clear();
   PFPID.clear();
   SliceID.clear();
+  PlaneID.clear();
   run.clear();
   event.clear();
   nSpills = 0;
   SpectrumLoader loader(fname);
 
-  const Binning bins = Binning::Simple(100, 0, 5000);
+  const Binning bins = Binning::Simple(1, 0, 1);
 
   SpillCut thisCut = kNoSpillCut;
   if (useSpillCuts) {

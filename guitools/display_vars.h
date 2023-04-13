@@ -35,7 +35,15 @@ const SpillMultiVar kVARS([](const caf::SRSpillProxy* sr) -> std::vector<double>
   int sliceID = 0;
   for (const auto& slc: sr->slc) {
     bool useSlice = true;
-    if (useSliceCuts) { for (const auto& cut : sliceCutIndices) { if (!slice_cuts[cut](&slc)) { useSlice = false; break; } } }
+    if (useSliceCuts) { 
+      for (const auto& i_cut : sliceCutIndices) { 
+        const auto& cut = slice_cuts[i_cut];
+        if (!cut(&slc)) { 
+          useSlice = false; 
+          break; 
+        } 
+      } 
+    }
     if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
     if (!useSlice) { continue; }
     for (const auto& hit: slc.reco.hit) {
