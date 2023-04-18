@@ -200,9 +200,9 @@ void LoadHits()
       for (auto &e: indices) {
         if (PFPID[spill][e] != pfp) { continue; }
 
-        if (!DrawPlane1 && PlaneID[spill][e] == 1) { continue; } 
-        if (!DrawPlane2 && PlaneID[spill][e] == 2) { continue; } 
-        if (!DrawPlane3 && PlaneID[spill][e] == 3) { continue; } 
+        if (!DrawPlane1 && PlaneID[spill][e] == 0) { continue; } 
+        if (!DrawPlane2 && PlaneID[spill][e] == 1) { continue; } 
+        if (!DrawPlane3 && PlaneID[spill][e] == 2) { continue; } 
 
         marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
         marker->SetPointId(new TNamed(Form("Point %d", e), ""));
