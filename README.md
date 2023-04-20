@@ -1,4 +1,4 @@
-# CAFDisplay
+# DeCAF
 3D event display to work with CAF files in the SBN collaboration.
 
 ## Introduction
@@ -10,7 +10,7 @@ Some data events from run 7418 are available for you to check out here: `/icarus
 
 ## How to Use
 ### Base Use
-1. On an ICARUS gpvm, go to your working area and clone this repository `git clone https://github.com/rhowell42/CAFDisplay.git`
+1. On an ICARUS gpvm, go to your working area and clone this repository `git clone https://github.com/rhowell42/DeCAF.git`
 3. Setup the relevant SBNSoftware/sbnana version `setup sbnana -v v09_58_02 -q e20:prof` 
    -N.B. You need version v09_58_02 or later. `scripts/setup_online.sh` does this for you
 4. Start your vncserver if you haven't already. Instructions for doing this [here](https://sbnsoftware.github.io/sbndcode_wiki/Viewing_events_remotely_with_VNC.html) if you haven't done this before.
