@@ -106,6 +106,10 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   slcvars = kSLCVARS(sr);
   srvars = kSRVARS(sr);
 
+  if (slcvars.empty() || srvars.empty()) {
+    return 42;
+  }
+
   std::vector<double> xarray;
   std::vector<double> yarray;
   std::vector<double> zarray;
@@ -113,9 +117,11 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   std::vector<double> slicearray;
   std::vector<double> planeidarray;
 
-  if (slcvars.empty() || srvars.empty()) {
-    return 42;
-  }
+  std::vector<double> crtxarray;
+  std::vector<double> crtyarray;
+  std::vector<double> crtzarray;
+  std::vector<double> crttimearray;
+  std::vector<double> crtplanearray;
 
   for (size_t i = 0; i<slcvars.size()-kSlcEnd; i+=kSlcEnd) {
     xarray.push_back(slcvars[i+x]);
@@ -126,19 +132,6 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
     planeidarray.push_back(slcvars[i+kplaneid]);
   }
 
-  X.push_back(xarray);
-  Y.push_back(yarray);
-  Z.push_back(zarray);
-  PFPID.push_back(pfparray);
-  SliceID.push_back(slicearray);
-  PlaneID.push_back(planeidarray);
-
-  std::vector<double> crtxarray;
-  std::vector<double> crtyarray;
-  std::vector<double> crtzarray;
-  std::vector<double> crttimearray;
-  std::vector<double> crtplanearray;
-
   for (size_t i = 0; i<srvars.size()-kSrEnd; i+=kSrEnd) {
     crtxarray.push_back(srvars[i+crtx]);
     crtyarray.push_back(srvars[i+crty]);
@@ -146,6 +139,13 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
     crttimearray.push_back(srvars[i+crttime]);
     crtplanearray.push_back(srvars[i+crtplane]);
   }
+
+  X.push_back(xarray);
+  Y.push_back(yarray);
+  Z.push_back(zarray);
+  PFPID.push_back(pfparray);
+  SliceID.push_back(slicearray);
+  PlaneID.push_back(planeidarray);
 
   CRTX.push_back(crtxarray);
   CRTY.push_back(crtyarray);
@@ -175,9 +175,9 @@ void LoadHits()
   if (PlotCRTHits) {
     auto marker = new TEvePointSet();
     marker->SetOwnIds(kTRUE);
-    for (size_t e = 0; e<CRTX.size(); e++) {
+    for (size_t e = 0; e<CRTX[spill].size(); e++) {
         marker->SetNextPoint(CRTX[spill][e],CRTY[spill][e],CRTZ[spill][e]);
-        marker->SetPointId(new TNamed(Form("Point %d", int(e)), ""));
+        marker->SetPointId(new TNamed(Form("CRT Point %d", int(e)), ""));
     }
     marker->SetMarkerSize(.4);
     marker->SetMarkerStyle(8);
@@ -257,9 +257,9 @@ void LoadHits()
       for (auto &e: indices) {
         if (PFPID[spill][e] != pfp) { continue; }
 
-        if (!DrawPlane1 && PlaneID[spill][e] == 1) { continue; } 
-        if (!DrawPlane2 && PlaneID[spill][e] == 2) { continue; } 
-        if (!DrawPlane3 && PlaneID[spill][e] == 3) { continue; } 
+        if (!DrawPlane1 && PlaneID[spill][e] == 0) { continue; } 
+        if (!DrawPlane2 && PlaneID[spill][e] == 1) { continue; } 
+        if (!DrawPlane3 && PlaneID[spill][e] == 2) { continue; } 
 
         marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
         marker->SetPointId(new TNamed(Form("Point %d", e), ""));
