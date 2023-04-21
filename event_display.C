@@ -8,24 +8,10 @@
 #include "guitools/display_vars.h"
 #include "guitools/GUI.h"
 #include "guitools/MultiView.h"
-#include "tools/data_funcs.h"
+#include "tools/plot_tools.h"
 
 #include "TFile.h"
-#include "TH2.h"
-#include "TH3.h"
-#include "TAxis3D.h"
 #include "TStyle.h"
-#include "TPolyMarker3D.h"
-#include "TVirtualViewer3D.h"
-#include "TBuffer3D.h"
-#include "TBuffer3DTypes.h"
-#include "TText.h" 
-#include "TObject.h"
-#include "TVirtualPad.h"
-#include "TAtt3D.h"
-#include "TStyle.h" 
-#include "TPointSet3D.h"
-#include "TPointSet3DGL.h"
 #include "TEveViewer.h"
 #include "TEveManager.h"
 #include "TEvePointSet.h"
@@ -49,43 +35,6 @@
 #include <TEveWindow.h>
 
 using namespace ana;
-
-std::string fname;
-
-bool ColorByPFPs = false;
-bool ColorBySlice = true;
-
-bool DrawPlane1 = true;
-bool DrawPlane2 = true;
-bool DrawPlane3 = true;
-
-std::vector<std::vector<double>> X;
-std::vector<std::vector<double>> Y;
-std::vector<std::vector<double>> Z;
-
-std::vector<std::vector<double>> PFPID;
-std::vector<std::vector<double>> SliceID;
-std::vector<std::vector<double>> PlaneID;
-
-std::vector<int> run;
-std::vector<int> event;
-
-std::vector<double> plotvars;
-const int x = 0;
-const int y = 1;
-const int z = 2;
-const int kpfp = 3;
-const int kslice = 4;
-const int kplaneid = 5;
-const int kEnd = 6;
-
-std::vector<int> spillCutIndices;
-
-
-MultiView* gMultiView = 0;
-
-int spill = 0; 
-int nSpills = 0;
 
 const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   plotvars = kVARS(sr);
@@ -125,9 +74,35 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   return 42;
 });
 
+void GetSpectrumSelection()
+{
+  X.clear();
+  Y.clear();
+  Z.clear();
+  PFPID.clear();
+  SliceID.clear();
+  PlaneID.clear();
+  run.clear();
+  event.clear();
+  nSpills = 0;
+  SpectrumLoader loader(fname);
+
+  const Binning bins = Binning::Simple(1, 0, 1);
+
+  SpillCut thisCut = kNoSpillCut;
+  if (useSpillCuts) {
+    for (auto cut : spillCutIndices) { 
+        thisCut = thisCut && spill_cuts[cut];
+    }
+  }
+
+  Spectrum sFindSpill("",bins,loader,kFindEvents,thisCut,kSpillUnweighted);
+
+  loader.Go();
+}
 void LoadHits()
 {
-  if (SliceID.empty()) {
+  if (event.empty()) {
       gMultiView->DestroyEventRPhi();
 
       gMultiView->DestroyEventRhoZ();
@@ -136,93 +111,66 @@ void LoadHits()
     return;
   }
 
+  std::vector<double> color_ids;
+  std::vector<double> unique_indices;
+  std::vector<double>::iterator it;
+
   if (ColorBySlice) {
-    std::vector<double> uniqueSliceIDs = SliceID[spill];
-    std::vector<double>::iterator it;
-    it = std::unique(uniqueSliceIDs.begin(),uniqueSliceIDs.end());
-    uniqueSliceIDs.resize(std::distance(uniqueSliceIDs.begin(),it));
-
-    int c = 0;
-    for (int sliceID : uniqueSliceIDs) {
-      if (c == 10 || c == 19) { c++; }
-      auto marker = new TEvePointSet();
-      marker->SetOwnIds(kTRUE);
-
-      int target = sliceID; 
-      std::vector<int> indices = findItems(SliceID[spill], target);
-      char slice[5];
-      sprintf(slice,"%d",target);
-
-      for (auto &e: indices) {
-        if (SliceID[spill][e] != sliceID) { continue; } 
-
-        if (!DrawPlane1 && PlaneID[spill][e] == 0) { continue; } 
-        if (!DrawPlane2 && PlaneID[spill][e] == 1) { continue; } 
-        if (!DrawPlane3 && PlaneID[spill][e] == 2) { continue; } 
-
-        marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
-        marker->SetPointId(new TNamed(Form("Point %d", e), ""));
-      }
-      marker->SetMarkerSize(.4);
-      marker->SetMarkerStyle(8);
-      marker->SetMainColor(1+c);
-      gEve->AddElement(marker);
-      auto top = gEve->GetCurrentEvent();
-
-      gMultiView->DestroyEventRPhi();
-      gMultiView->ImportEventRPhi(top);
-
-      gMultiView->DestroyEventRhoZ();
-      gMultiView->ImportEventRhoZ(top);
-      gEve->Redraw3D(kFALSE,kTRUE);
-      c++;
-    }
+    color_ids = SliceID[spill];
+    unique_indices = SliceID[spill];
+    std::sort(unique_indices.begin(),unique_indices.end());
+    it = std::unique(unique_indices.begin(),unique_indices.end());
+    unique_indices.resize(std::distance(unique_indices.begin(),it));
   }
   else if (ColorByPFPs) {
-    std::vector<double> uniquePFPs = PFPID[spill];
-    std::vector<double>::iterator it;
-    std::sort(uniquePFPs.begin(), uniquePFPs.end());
-    it = std::unique(uniquePFPs.begin(),uniquePFPs.end());
-    uniquePFPs.resize(std::distance(uniquePFPs.begin(),it));
-   
-    int c = 0;
-
-    for (int pfp : uniquePFPs) {
-      if (c == 10 || c == 19) { c++; }
-      auto marker = new TEvePointSet();
-      marker->SetOwnIds(kTRUE);
-
-      int target = pfp; 
-      std::vector<int> indices = findItems(PFPID[spill], target);
-      char slice[252];
-      sprintf(slice,"%d",target);
-
-      for (auto &e: indices) {
-        if (PFPID[spill][e] != pfp) { continue; }
-
-        if (!DrawPlane1 && PlaneID[spill][e] == 0) { continue; } 
-        if (!DrawPlane2 && PlaneID[spill][e] == 1) { continue; } 
-        if (!DrawPlane3 && PlaneID[spill][e] == 2) { continue; } 
-
-        marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
-        marker->SetPointId(new TNamed(Form("Point %d", e), ""));
-      }
-      marker->SetMarkerSize(.4);
-      marker->SetMarkerStyle(8);
-      marker->SetMainColor(1+c);
-      gEve->AddElement(marker);
-      auto top = gEve->GetCurrentEvent();
-
-      gMultiView->DestroyEventRPhi();
-      gMultiView->ImportEventRPhi(top);
-
-      gMultiView->DestroyEventRhoZ();
-      gMultiView->ImportEventRhoZ(top);
-      gEve->Redraw3D(kFALSE,kTRUE);
-      c++;
-    }
+    color_ids = PFPID[spill];
+    unique_indices = PFPID[spill];
+    std::sort(unique_indices.begin(),unique_indices.end());
+    it = std::unique(unique_indices.begin(),unique_indices.end());
+    unique_indices.resize(std::distance(unique_indices.begin(),it));
   }
-  
+
+  int c = 0;
+
+  for (int ID : unique_indices) {
+    if (c == 10 || c == 19) { c++; }
+
+    auto marker = new TEvePointSet();
+    marker->SetOwnIds(kTRUE);
+
+    int target = ID; 
+    std::vector<int> indices = findItems(color_ids, target);
+    int cryo;
+    for (auto &e: indices) {
+
+      if (color_ids[e] != ID) { continue; } 
+
+      if (!DrawPlane1 && PlaneID[spill][e] == 0) { continue; } 
+      if (!DrawPlane2 && PlaneID[spill][e] == 1) { continue; } 
+      if (!DrawPlane3 && PlaneID[spill][e] == 2) { continue; } 
+
+      marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
+
+      if (X[spill][e] > 0) { cryo=1; }
+      else { cryo=0; }
+      marker->SetPointId(new TNamed(Form("Point %d CRYO %d", e, cryo), ""));
+
+    }
+
+    marker->SetMarkerSize(.4);
+    marker->SetMarkerStyle(8);
+    marker->SetMainColor(1+c);
+    gEve->AddElement(marker);
+    auto top = gEve->GetCurrentEvent();
+
+    gMultiView->DestroyEventRPhi();
+    gMultiView->ImportEventRPhi(top);
+
+    gMultiView->DestroyEventRhoZ();
+    gMultiView->ImportEventRhoZ(top);
+    gEve->Redraw3D(kFALSE,kTRUE);
+    c++;
+  }
 }
 
 void doAdvanceSpill()
@@ -301,32 +249,6 @@ void doDrawPlane3(bool pressed)
   LoadHits();
 }
 
-void GetSpectrumSelection()
-{
-  X.clear();
-  Y.clear();
-  Z.clear();
-  PFPID.clear();
-  SliceID.clear();
-  PlaneID.clear();
-  run.clear();
-  event.clear();
-  nSpills = 0;
-  SpectrumLoader loader(fname);
-
-  const Binning bins = Binning::Simple(1, 0, 1);
-
-  SpillCut thisCut = kNoSpillCut;
-  if (useSpillCuts) {
-    for (auto cut : spillCutIndices) { 
-        thisCut = thisCut && spill_cuts[cut];
-    }
-  }
-
-  Spectrum sFindSpill("",bins,loader,kFindEvents,thisCut,kSpillUnweighted);
-
-  loader.Go();
-}
 
 void event_display(const std::string inputName)
 {
