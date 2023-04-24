@@ -449,6 +449,84 @@ void event_display(const std::string inputName)
    Phy_Building->AddNodeOverlap(TPC,3,new TGeoTranslation( cryoPosX-tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
    Phy_Building->AddNodeOverlap(TPC,4,new TGeoTranslation( cryoPosX+tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
 
+   // Top CRTs 
+   TGeoVolume *CRT_30 = geom->MakeBox("CRT_30", Iron, 550, 2, 1280); 
+   CRT_30->SetLineColor(18);
+   CRT_30->SetLineWidth(2);
+   CRT_30->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_30, 1, new TGeoTranslation(0, 617.4, 150));
+   TGeoVolume *CRT_31_32 = geom->MakeBox("CRT_31_32", Iron, 2, 81, 1280); // box for rim east and rim west - same size
+   CRT_31_32->SetLineColor(18);
+   CRT_31_32->SetLineWidth(2);
+   CRT_31_32->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_31_32, 1, new TGeoTranslation(555, 496, 150)); // rim west, 31
+   Phy_Building->AddNodeOverlap(CRT_31_32, 2, new TGeoTranslation(-555, 496, 150)); // rim east, 32
+   TGeoVolume *CRT_33 = geom->MakeBox("CRT_33", Iron, 448.5, 81, 2);
+   CRT_33->SetLineColor(18);
+   CRT_33->SetLineWidth(2);
+   CRT_33->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_33, 1, new TGeoTranslation(91.5, 496, -1143)); // rim south, 33
+   TGeoVolume *CRT_34 = geom->MakeBox("CRT_34", Iron, 541.5, 80, 2);
+   CRT_34->SetLineColor(18);
+   CRT_34->SetLineWidth(2);
+   CRT_34->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_34, 1, new TGeoTranslation(.5, 525, 1533)); // rim north, 34  
+
+   // Side West
+   TGeoVolume *CRT_40_42 = geom->MakeBox("CRT_40_42", Iron, 4.135, 375, 400);
+   CRT_40_42->SetLineColor(18);
+   CRT_40_42->SetLineWidth(2);
+   CRT_40_42->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_40_42, 1, new TGeoTranslation(530.355, 75, -773.34)); // side west-south, 40    
+   Phy_Building->AddNodeOverlap(CRT_40_42, 2, new TGeoTranslation(530.355, 75, 759.34)); // side west-north, 42 
+   TGeoVolume *CRT_41 = geom->MakeBox("CRT_41", Iron, 4.135, 335, 400);
+   CRT_41->SetLineColor(18);
+   CRT_41->SetLineWidth(2);
+   CRT_41->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_41, 1, new TGeoTranslation(560.19, 55, -7)); // side west-center, 41    
+
+   //Side East
+   TGeoVolume *CRT_43 = geom->MakeBox("CRT_43", Iron, 4.135, 340, 400);
+   CRT_43->SetLineColor(18);
+   CRT_43->SetLineWidth(2);
+   CRT_43->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_43, 1, new TGeoTranslation(-530.355, 80, -773.34)); // side east-south, 43 
+   TGeoVolume *CRT_44 = geom->MakeBox("CRT_44", Iron, 4.135, 310, 400);
+   CRT_44->SetLineColor(18);
+   CRT_44->SetLineWidth(2);
+   CRT_44->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_44, 1, new TGeoTranslation(-560.19, 90, -7)); // side east-center, 44    
+   TGeoVolume *CRT_45 = geom->MakeBox("CRT_45", Iron, 4.135, 365, 400);
+   CRT_45->SetLineColor(18);
+   CRT_45->SetLineWidth(2);
+   CRT_45->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_45, 1, new TGeoTranslation(-530.355, 85, 759.34)); // side east-north, 45 
+   // Side South
+   TGeoVolume *CRT_46 = geom->MakeBox("CRT_46", Iron, 500, 400, 7.205);
+   CRT_46->SetLineColor(18);
+   CRT_46->SetLineWidth(2);
+   CRT_46->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_46, 1, new TGeoTranslation(0, 100, -1127.535)); // side south, 46
+   
+   //Side North wall is complicated - split up into 3 sections (top, mid(E+W)), bottom(E+W)) 
+   TGeoVolume *CRT_47_t = geom->MakeBox("CRT_47_t", Iron, 508.275, 120, 4.135); // Side North wall - top section
+   CRT_47_t->SetLineColor(18);
+   CRT_47_t->SetLineWidth(2);
+   CRT_47_t->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_47_t, 1, new TGeoTranslation(0, 200, 1173.855)); // side north, 47 
+   TGeoVolume *CRT_47_m = geom->MakeBox("CRT_47_m", Iron, 77.475, 80, 4.135); // Side North wall - mid section
+   CRT_47_m->SetLineColor(18);
+   CRT_47_m->SetLineWidth(2);
+   CRT_47_m->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_47_m, 1, new TGeoTranslation(-430.8, 0, 1173.855)); // side north, 47 - mid East  
+   Phy_Building->AddNodeOverlap(CRT_47_m, 2, new TGeoTranslation(430.8, 0, 1173.855)); // side north, 47 - mid West
+   TGeoVolume *CRT_47_b = geom->MakeBox("CRT_47_m", Iron, 64.135, 40, 4.135); // Side North wall - bottom section 
+   CRT_47_b->SetLineColor(18);
+   CRT_47_b->SetLineWidth(2);
+   CRT_47_b->SetTransparency(90);
+   Phy_Building->AddNodeOverlap(CRT_47_b, 1, new TGeoTranslation(-444.14, -120, 1173.855)); // side north, 47 - bottom East
+   Phy_Building->AddNodeOverlap(CRT_47_b, 2, new TGeoTranslation(444.14, -120, 1173.855)); // side north, 47 - bottom West
+
    TEveManager::Create();
 
    TGeoNode* node = gGeoManager->GetTopNode();
