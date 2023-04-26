@@ -118,7 +118,7 @@
 #ifndef ROOT_TGuiBldDragManager
 #include "TGuiBldDragManager.h"
 #endif
-
+#include <TGDoubleSlider.h>
 #include "TEvePad.h"
 #include "TGLEmbeddedViewer.h"
 #include "Riostream.h"
@@ -166,6 +166,8 @@ private:
    TGListBox           *fSliceBox;
    TGListBox           *fSpillBox;
    TList               *fSelected;
+   TGDoubleHSlider     *fTimeSlider;
+   TGStatusBar         *fTimeStatus;
 
 public:
    MyMainFrame();
@@ -183,6 +185,7 @@ public:
    void CheckPlane2();
    void CheckPlane3();
    void HandleButtons();
+   void DoSlider();
 };
 
 MyMainFrame::MyMainFrame() {
@@ -263,7 +266,6 @@ MyMainFrame::MyMainFrame() {
    fCutButtons->Resize(230,100);
    controls->AddFrame(fCutButtons);
    
-   // list box widget containing 10 entries
    fSelected = new TList;
    fSliceBox = new TGListBox(fCutBoxes, 90);
    fSliceBox->Resize(100, 80);
@@ -295,6 +297,20 @@ MyMainFrame::MyMainFrame() {
 
    fCutBoxes->Resize(230,100);
    controls->AddFrame(fCutBoxes);
+
+   fTimeSlider = new TGDoubleHSlider(controls,100,kDoubleScaleDownRight,1);
+   fTimeSlider->SetRange(-3000,3000);
+   fTimeSlider->SetPosition(0,10);
+   fTimeSlider->Connect("PositionChanged()", "MyMainFrame", this, "DoSlider()");
+   fTimeSlider->Resize(230,10);
+   controls->AddFrame(fTimeSlider);
+
+   Int_t time[] = {100};
+   fTimeStatus = new TGStatusBar(controls,50,10,kHorizontalFrame);
+   fTimeStatus->SetParts(time,1);
+   fTimeStatus->SetText("Time Window: 0.00 us ~ 10.00 us",0);
+   fTimeStatus->Resize(230,15);
+   controls->AddFrame(fTimeStatus);
 
    controls->Resize(230,600);
 
@@ -373,6 +389,13 @@ void MyMainFrame::CheckPlane2() {
 void MyMainFrame::CheckPlane3() {
   bool pressed = fCheckPlane3->GetState() == kButtonDown;
   doDrawPlane3(pressed);
+}
+
+void MyMainFrame::DoSlider() {
+  doTimeSel(fTimeSlider->GetMinPosition(),fTimeSlider->GetMaxPosition());
+  char s[250] = {0};
+  sprintf(s, "Time Window: %.2f us ~ %.2f us",fTimeSlider->GetMinPosition(),fTimeSlider->GetMaxPosition());
+  fTimeStatus->SetText(s,0);
 }
 
 MyMainFrame::~MyMainFrame() {

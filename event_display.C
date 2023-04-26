@@ -248,7 +248,10 @@ void doDrawPlane3(bool pressed)
   gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
-
+void doTimeSel(float min, float max)
+{
+  std::cout<<"min: "<<min<<" max: "<<max<<std::endl;   
+}
 
 void event_display(const std::string inputName)
 {
