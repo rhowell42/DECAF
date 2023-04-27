@@ -95,32 +95,6 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   return 42;
 });
 
-void GetSpectrumSelection()
-{
-  X.clear();
-  Y.clear();
-  Z.clear();
-  PFPID.clear();
-  SliceID.clear();
-  PlaneID.clear();
-  run.clear();
-  event.clear();
-  nSpills = 0;
-  SpectrumLoader loader(fname);
-
-  const Binning bins = Binning::Simple(1, 0, 1);
-
-  SpillCut thisCut = kNoSpillCut;
-  if (useSpillCuts) {
-    for (auto cut : spillCutIndices) { 
-        thisCut = thisCut && spill_cuts[cut];
-    }
-  }
-
-  Spectrum sFindSpill("",bins,loader,kFindEvents,thisCut,kSpillUnweighted);
-
-  loader.Go();
-}
 void LoadHits()
 {
   if (event.empty()) {
