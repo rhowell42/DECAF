@@ -37,7 +37,12 @@
 using namespace ana;
 
 const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
-  plotvars = kVARS(sr);
+  slcvars = kSLCVARS(sr);
+  srvars = kSRVARS(sr);
+
+  if (slcvars.empty() || srvars.empty()) {
+    return 42;
+  }
 
   std::vector<double> xarray;
   std::vector<double> yarray;
@@ -46,18 +51,28 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   std::vector<double> slicearray;
   std::vector<double> planeidarray;
 
-  if (plotvars.empty()) {
-    return 42;
+  std::vector<double> crtxarray;
+  std::vector<double> crtyarray;
+  std::vector<double> crtzarray;
+  std::vector<double> crttimearray;
+  std::vector<double> crtplanearray;
+
+  for (size_t i = 0; i<slcvars.size()-kSlcEnd; i+=kSlcEnd) {
+    xarray.push_back(slcvars[i+x]);
+    yarray.push_back(slcvars[i+y]);
+    zarray.push_back(slcvars[i+z]);
+    pfparray.push_back(slcvars[i+kpfp]);
+    slicearray.push_back(slcvars[i+kslice]);
+    planeidarray.push_back(slcvars[i+kplaneid]);
   }
 
-    for (size_t i = 0; i<plotvars.size()-kEnd; i+=kEnd) {
-      xarray.push_back(plotvars[i+x]);
-      yarray.push_back(plotvars[i+y]);
-      zarray.push_back(plotvars[i+z]);
-      pfparray.push_back(plotvars[i+kpfp]);
-      slicearray.push_back(plotvars[i+kslice]);
-      planeidarray.push_back(plotvars[i+kplaneid]);
-    }  
+  for (size_t i = 0; i<srvars.size()-kSrEnd; i+=kSrEnd) {
+    crtxarray.push_back(srvars[i+crtx]);
+    crtyarray.push_back(srvars[i+crty]);
+    crtzarray.push_back(srvars[i+crtz]);
+    crttimearray.push_back(srvars[i+crttime]);
+    crtplanearray.push_back(srvars[i+crtplane]);
+  }
 
   X.push_back(xarray);
   Y.push_back(yarray);
@@ -65,6 +80,12 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   PFPID.push_back(pfparray);
   SliceID.push_back(slicearray);
   PlaneID.push_back(planeidarray);
+
+  CRTX.push_back(crtxarray);
+  CRTY.push_back(crtyarray);
+  CRTZ.push_back(crtzarray);
+  CRTTime.push_back(crttimearray);
+  CRTPlane.push_back(crtplanearray);
 
   run.push_back(kRun(sr));
   event.push_back(kEvt(sr));
@@ -74,32 +95,6 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   return 42;
 });
 
-void GetSpectrumSelection()
-{
-  X.clear();
-  Y.clear();
-  Z.clear();
-  PFPID.clear();
-  SliceID.clear();
-  PlaneID.clear();
-  run.clear();
-  event.clear();
-  nSpills = 0;
-  SpectrumLoader loader(fname);
-
-  const Binning bins = Binning::Simple(1, 0, 1);
-
-  SpillCut thisCut = kNoSpillCut;
-  if (useSpillCuts) {
-    for (auto cut : spillCutIndices) { 
-        thisCut = thisCut && spill_cuts[cut];
-    }
-  }
-
-  Spectrum sFindSpill("",bins,loader,kFindEvents,thisCut,kSpillUnweighted);
-
-  loader.Go();
-}
 void LoadHits()
 {
   if (event.empty()) {
@@ -109,6 +104,27 @@ void LoadHits()
       gEve->Redraw3D(kFALSE,kTRUE);
 
     return;
+  }
+
+  if (PlotCRTHits) {
+    auto marker = new TEvePointSet();
+    marker->SetOwnIds(kTRUE);
+    for (size_t e = 0; e<CRTX[spill].size(); e++) {
+        marker->SetNextPoint(CRTX[spill][e],CRTY[spill][e],CRTZ[spill][e]);
+        marker->SetPointId(new TNamed(Form("CRT Point %d", int(e)), ""));
+    }
+    marker->SetMarkerSize(.4);
+    marker->SetMarkerStyle(8);
+    marker->SetMainColor(1);
+    gEve->AddElement(marker);
+    auto top = gEve->GetCurrentEvent();
+
+    gMultiView->DestroyEventRPhi();
+    gMultiView->ImportEventRPhi(top);
+
+    gMultiView->DestroyEventRhoZ();
+    gMultiView->ImportEventRhoZ(top);
+    gEve->Redraw3D(kFALSE,kTRUE);
   }
 
   std::vector<double> color_ids;
@@ -207,6 +223,12 @@ void doColorbyPFP()
   gEve->GetCurrentEvent()->DestroyElements();
   LoadHits();
 }
+void doDrawCRTHits(bool pressed)
+{
+  PlotCRTHits = pressed;
+  gEve->GetCurrentEvent()->DestroyElements();
+  LoadHits();
+}
 void doUseSliceCuts(std::vector<int> cut_indices)
 {
   useSliceCuts = true;
@@ -251,6 +273,41 @@ void doDrawPlane3(bool pressed)
 void doTimeSel(float min, float max)
 {
   std::cout<<"min: "<<min<<" max: "<<max<<std::endl;   
+}
+
+void GetSpectrumSelection()
+{
+  X.clear();
+  Y.clear();
+  Z.clear();
+  PFPID.clear();
+  PlaneID.clear();
+  SliceID.clear();
+
+  CRTX.clear();
+  CRTY.clear();
+  CRTZ.clear();
+  CRTTime.clear();
+  CRTPlane.clear();
+
+  run.clear();
+  event.clear();
+  nSpills = 0;
+  SpectrumLoader loader(fname);
+
+  const Binning bins = Binning::Simple(1, 0, 1);
+
+  SpillCut thisCut = kNoSpillCut;
+  if (useSpillCuts) {
+    for (auto cut : spillCutIndices) { 
+        thisCut = thisCut && spill_cuts[cut];
+    }
+  }
+
+  Spectrum sFindSpill("",bins,loader,kFindEvents,thisCut,kSpillUnweighted);
+
+  loader.Go();
+>>>>>>> feature/CRT_hits
 }
 
 void event_display(const std::string inputName)
