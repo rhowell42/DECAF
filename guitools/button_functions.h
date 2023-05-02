@@ -12,7 +12,7 @@ void doDrawPlane1(bool use);
 void doDrawPlane2(bool use);
 void doDrawPlane3(bool use);
 void doTimeSel(float minTime, float maxTime);
-void doDrawCRTHits(bool use);
+void doDrawCRTHits(bool use, float minTime, float maxTime);
 
 int runstring;
 int eventstring;

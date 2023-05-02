@@ -389,7 +389,9 @@ void MyMainFrame::CheckNuSlice() {
 }
 void MyMainFrame::DrawCRTHits() {
   bool pressed = fCRTHits->GetState() == kButtonDown;
-  doDrawCRTHits(pressed); 
+  float min = fTimeSlider->GetMinPosition();
+  float max  = fTimeSlider->GetMaxPosition();
+  doDrawCRTHits(pressed, min, max); 
 }
 void MyMainFrame::CheckPlane1() {
   bool pressed = fCheckPlane1->GetState() == kButtonDown;

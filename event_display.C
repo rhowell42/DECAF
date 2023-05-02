@@ -106,34 +106,32 @@ void LoadCRTHits(float min, float max)
     return;
   }
 
-  if (PlotCRTHits) {
-    auto top = gEve->GetCurrentEvent(); 
-    auto child = top->FindChild("CRT Hits");
-    if (child) { child->Destroy(); }
+  auto top = gEve->GetCurrentEvent(); 
+  auto child = top->FindChild("CRT Hits");
+  if (child) { child->Destroy(); }
 
-    auto marker = new TEvePointSet();
-    marker->SetOwnIds(kTRUE);
+  auto marker = new TEvePointSet();
+  marker->SetOwnIds(kTRUE);
 
-    for (size_t e = 0; e<CRTX[spill].size(); e++) {
-        if (CRTTime[spill][e] < min || CRTTime[spill][e] > max) { continue; }
+  for (size_t e = 0; e<CRTX[spill].size(); e++) {
+    if (CRTTime[spill][e] < min || CRTTime[spill][e] > max) { continue; }
 
-        marker->SetNextPoint(CRTX[spill][e],CRTY[spill][e],CRTZ[spill][e]);
-        marker->SetPointId(new TNamed(Form("CRT Point %d", int(e)), ""));
-    }
-    marker->SetElementName("CRT Hits");
-    marker->SetMarkerSize(.4);
-    marker->SetMarkerStyle(8);
-    marker->SetMainColor(1);
-    gEve->AddElement(marker);
-    top = gEve->GetCurrentEvent(); 
-
-    gMultiView->DestroyEventRPhi();
-    gMultiView->ImportEventRPhi(top);
-
-    gMultiView->DestroyEventRhoZ();
-    gMultiView->ImportEventRhoZ(top);
-    gEve->Redraw3D(kFALSE,kTRUE);
+    marker->SetNextPoint(CRTX[spill][e],CRTY[spill][e],CRTZ[spill][e]);
+    marker->SetPointId(new TNamed(Form("CRT Point %d", int(e)), ""));
   }
+  marker->SetElementName("CRT Hits");
+  marker->SetMarkerSize(.4);
+  marker->SetMarkerStyle(8);
+  marker->SetMainColor(1);
+  gEve->AddElement(marker);
+  top = gEve->GetCurrentEvent(); 
+
+  gMultiView->DestroyEventRPhi();
+  gMultiView->ImportEventRPhi(top);
+
+  gMultiView->DestroyEventRhoZ();
+  gMultiView->ImportEventRhoZ(top);
+  gEve->Redraw3D(kFALSE,kTRUE);
 }
 
 void LoadTPCHits()
@@ -244,10 +242,17 @@ void doColorbyPFP()
   gEve->GetCurrentEvent()->DestroyElements();
   LoadTPCHits();
 }
-void doDrawCRTHits(bool pressed)
+void doDrawCRTHits(bool pressed, float min, float max)
 {
   PlotCRTHits = pressed;
-  LoadCRTHits(0, 10);
+  if (PlotCRTHits) { 
+    LoadCRTHits(min, max); 
+  }
+  else {
+    auto top = gEve->GetCurrentEvent(); 
+    auto child = top->FindChild("CRT Hits");
+    if (child) { child->Destroy(); }
+  }
 }
 void doUseSliceCuts(std::vector<int> cut_indices)
 {
@@ -292,7 +297,7 @@ void doDrawPlane3(bool pressed)
 }
 void doTimeSel(float min, float max)
 {
-  LoadCRTHits(min, max);
+  if (PlotCRTHits) { LoadCRTHits(min, max); }
 }
 
 void GetSpectrumSelection()
