@@ -95,7 +95,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   return 42;
 });
 
-void LoadHits()
+void LoadCRTHits(float min, float max)
 {
   if (event.empty()) {
       gMultiView->DestroyEventRPhi();
@@ -107,17 +107,25 @@ void LoadHits()
   }
 
   if (PlotCRTHits) {
+    auto top = gEve->GetCurrentEvent(); 
+    auto child = top->FindChild("CRT Hits");
+    if (child) { child->Destroy(); }
+
     auto marker = new TEvePointSet();
     marker->SetOwnIds(kTRUE);
+
     for (size_t e = 0; e<CRTX[spill].size(); e++) {
+        if (CRTTime[spill][e] < min || CRTTime[spill][e] > max) { continue; }
+
         marker->SetNextPoint(CRTX[spill][e],CRTY[spill][e],CRTZ[spill][e]);
         marker->SetPointId(new TNamed(Form("CRT Point %d", int(e)), ""));
     }
+    marker->SetElementName("CRT Hits");
     marker->SetMarkerSize(.4);
     marker->SetMarkerStyle(8);
     marker->SetMainColor(1);
     gEve->AddElement(marker);
-    auto top = gEve->GetCurrentEvent();
+    top = gEve->GetCurrentEvent(); 
 
     gMultiView->DestroyEventRPhi();
     gMultiView->ImportEventRPhi(top);
@@ -126,6 +134,19 @@ void LoadHits()
     gMultiView->ImportEventRhoZ(top);
     gEve->Redraw3D(kFALSE,kTRUE);
   }
+}
+
+void LoadTPCHits()
+{
+  if (event.empty()) {
+      gMultiView->DestroyEventRPhi();
+
+      gMultiView->DestroyEventRhoZ();
+      gEve->Redraw3D(kFALSE,kTRUE);
+
+    return;
+  }
+
 
   std::vector<double> color_ids;
   std::vector<double> unique_indices;
@@ -194,7 +215,7 @@ void doAdvanceSpill()
   if (spill < nSpills - 1) {
     spill++;
     gEve->GetCurrentEvent()->DestroyElements();
-    LoadHits();
+    LoadTPCHits();
     runstring = run[spill];
     eventstring = event[spill];
   }
@@ -204,7 +225,7 @@ void doPreviousSpill()
   if (spill > 0) {
     spill--;
     gEve->GetCurrentEvent()->DestroyElements();
-    LoadHits();
+    LoadTPCHits();
     runstring = run[spill];
     eventstring = event[spill];
   }
@@ -214,20 +235,19 @@ void doColorbySlice()
   ColorByPFPs = false;
   ColorBySlice = true;  
   gEve->GetCurrentEvent()->DestroyElements();
-  LoadHits();
+  LoadTPCHits();
 }
 void doColorbyPFP()
 {
   ColorByPFPs = true;
   ColorBySlice = false;  
   gEve->GetCurrentEvent()->DestroyElements();
-  LoadHits();
+  LoadTPCHits();
 }
 void doDrawCRTHits(bool pressed)
 {
   PlotCRTHits = pressed;
-  gEve->GetCurrentEvent()->DestroyElements();
-  LoadHits();
+  LoadCRTHits(0, 10);
 }
 void doUseSliceCuts(std::vector<int> cut_indices)
 {
@@ -235,7 +255,7 @@ void doUseSliceCuts(std::vector<int> cut_indices)
   sliceCutIndices = cut_indices;
   GetSpectrumSelection();
   gEve->GetCurrentEvent()->DestroyElements();
-  LoadHits();
+  LoadTPCHits();
 }
 void doUseSpillCuts(std::vector<int> cut_indices)
 {
@@ -243,36 +263,36 @@ void doUseSpillCuts(std::vector<int> cut_indices)
   spillCutIndices = cut_indices;
   GetSpectrumSelection();
   gEve->GetCurrentEvent()->DestroyElements();
-  LoadHits();
+  LoadTPCHits();
 }
 void doUseNuSlice(bool pressed)
 {
   onlyNuSlice = pressed;
   GetSpectrumSelection();
   gEve->GetCurrentEvent()->DestroyElements();
-  LoadHits();
+  LoadTPCHits();
 }
 void doDrawPlane1(bool pressed)
 {
   DrawPlane1 = pressed;
   gEve->GetCurrentEvent()->DestroyElements();
-  LoadHits();
+  LoadTPCHits();
 }
 void doDrawPlane2(bool pressed)
 {
   DrawPlane2 = pressed;
   gEve->GetCurrentEvent()->DestroyElements();
-  LoadHits();
+  LoadTPCHits();
 }
 void doDrawPlane3(bool pressed)
 {
   DrawPlane3 = pressed;
   gEve->GetCurrentEvent()->DestroyElements();
-  LoadHits();
+  LoadTPCHits();
 }
 void doTimeSel(float min, float max)
 {
-  std::cout<<"min: "<<min<<" max: "<<max<<std::endl;   
+  LoadCRTHits(min, max);
 }
 
 void GetSpectrumSelection()
@@ -307,7 +327,6 @@ void GetSpectrumSelection()
   Spectrum sFindSpill("",bins,loader,kFindEvents,thisCut,kSpillUnweighted);
 
   loader.Go();
->>>>>>> feature/CRT_hits
 }
 
 void event_display(const std::string inputName)
@@ -407,6 +426,6 @@ void event_display(const std::string inputName)
 
    gEve->AddEvent(new TEveEventManager("Event", "ICARUS CAF Event"));
    GetSpectrumSelection();
-   LoadHits();
+   LoadTPCHits();
    gEve->Redraw3D(kTRUE); // Reset camera after the first event has been shown.
 }

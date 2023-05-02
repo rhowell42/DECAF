@@ -67,7 +67,7 @@ const SpillMultiVar kSRVARS([](const caf::SRSpillProxy* sr) -> std::vector<doubl
     hits.push_back(hit.position.x);
     hits.push_back(hit.position.y);
     hits.push_back(hit.position.z);
-    hits.push_back(hit.time);
+    hits.push_back(hit.t1);
     hits.push_back(hit.plane);
   }
   return hits;
