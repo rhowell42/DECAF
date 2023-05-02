@@ -7,7 +7,7 @@ std::string fname;
 
 bool ColorByPFPs = false;
 bool ColorBySlice = true;
-
+bool PlotCRTHits = false;
 bool DrawPlane1 = true;
 bool DrawPlane2 = true;
 bool DrawPlane3 = true;
@@ -16,6 +16,12 @@ std::vector<std::vector<double>> X;
 std::vector<std::vector<double>> Y;
 std::vector<std::vector<double>> Z;
 
+std::vector<std::vector<double>> CRTX;
+std::vector<std::vector<double>> CRTY;
+std::vector<std::vector<double>> CRTZ;
+std::vector<std::vector<double>> CRTTime;
+std::vector<std::vector<double>> CRTPlane;
+
 std::vector<std::vector<double>> PFPID;
 std::vector<std::vector<double>> SliceID;
 std::vector<std::vector<double>> PlaneID;
@@ -23,7 +29,8 @@ std::vector<std::vector<double>> PlaneID;
 std::vector<int> run;
 std::vector<int> event;
 
-std::vector<double> plotvars;
+std::vector<double> slcvars;
+std::vector<double> srvars;
 
 std::vector<int> spillCutIndices;
 
@@ -33,7 +40,14 @@ const int z = 2;
 const int kpfp = 3;
 const int kslice = 4;
 const int kplaneid = 5;
-const int kEnd = 6;
+const int kSlcEnd = 6;
+
+const int crtx = 0;
+const int crty = 1;
+const int crtz = 2;
+const int crttime = 3;
+const int crtplane = 4;
+const int kSrEnd = 5;
 
 MultiView* gMultiView = 0;
 

@@ -30,7 +30,7 @@ bool onlyNuSlice = true;
 
 std::vector<int> sliceCutIndices;
 
-const SpillMultiVar kVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+const SpillMultiVar kSLCVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   int sliceID = 0;
   for (const auto& slc: sr->slc) {
@@ -58,6 +58,17 @@ const SpillMultiVar kVARS([](const caf::SRSpillProxy* sr) -> std::vector<double>
       hits.push_back(hit.planeID);
     }
     sliceID++;
+  }
+  return hits;
+});
+const SpillMultiVar kSRVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+  std::vector<double> hits;
+  for (const auto& hit : sr->crt_hits) {
+    hits.push_back(hit.position.x);
+    hits.push_back(hit.position.y);
+    hits.push_back(hit.position.z);
+    hits.push_back(hit.t1);
+    hits.push_back(hit.plane);
   }
   return hits;
 });
