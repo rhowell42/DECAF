@@ -33,7 +33,7 @@
 #include <TEveEventManager.h> 
 #include <TEveBrowser.h>
 #include <TEveWindow.h>
-
+#include "TMarker3DBox.h"
 using namespace ana;
 
 const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
@@ -41,7 +41,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   srvars = kSRVARS(sr);
 
   if (slcvars.empty() || srvars.empty()) {
-    return 42;
+   return 42;
   }
 
   std::vector<double> xarray;
@@ -58,20 +58,20 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   std::vector<double> crtplanearray;
 
   for (size_t i = 0; i<slcvars.size()-kSlcEnd; i+=kSlcEnd) {
-    xarray.push_back(slcvars[i+x]);
-    yarray.push_back(slcvars[i+y]);
-    zarray.push_back(slcvars[i+z]);
-    pfparray.push_back(slcvars[i+kpfp]);
-    slicearray.push_back(slcvars[i+kslice]);
-    planeidarray.push_back(slcvars[i+kplaneid]);
+   xarray.push_back(slcvars[i+x]);
+   yarray.push_back(slcvars[i+y]);
+   zarray.push_back(slcvars[i+z]);
+   pfparray.push_back(slcvars[i+kpfp]);
+   slicearray.push_back(slcvars[i+kslice]);
+   planeidarray.push_back(slcvars[i+kplaneid]);
   }
 
   for (size_t i = 0; i<srvars.size()-kSrEnd; i+=kSrEnd) {
-    crtxarray.push_back(srvars[i+crtx]);
-    crtyarray.push_back(srvars[i+crty]);
-    crtzarray.push_back(srvars[i+crtz]);
-    crttimearray.push_back(srvars[i+crttime]);
-    crtplanearray.push_back(srvars[i+crtplane]);
+   crtxarray.push_back(srvars[i+crtx]);
+   crtyarray.push_back(srvars[i+crty]);
+   crtzarray.push_back(srvars[i+crtz]);
+   crttimearray.push_back(srvars[i+crttime]);
+   crtplanearray.push_back(srvars[i+crtplane]);
   }
 
   X.push_back(xarray);
@@ -98,12 +98,12 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
 void LoadCRTHits(float min, float max)
 {
   if (event.empty()) {
-      gMultiView->DestroyEventRPhi();
+    gMultiView->DestroyEventRPhi();
 
-      gMultiView->DestroyEventRhoZ();
-      gEve->Redraw3D(kFALSE,kTRUE);
+    gMultiView->DestroyEventRhoZ();
+    gEve->Redraw3D(kFALSE,kTRUE);
 
-    return;
+   return;
   }
 
   auto top = gEve->GetCurrentEvent(); 
@@ -114,10 +114,10 @@ void LoadCRTHits(float min, float max)
   marker->SetOwnIds(kTRUE);
 
   for (size_t e = 0; e<CRTX[spill].size(); e++) {
-    if (CRTTime[spill][e] < min || CRTTime[spill][e] > max) { continue; }
+   if (CRTTime[spill][e] < min || CRTTime[spill][e] > max) { continue; }
 
-    marker->SetNextPoint(CRTX[spill][e],CRTY[spill][e],CRTZ[spill][e]);
-    marker->SetPointId(new TNamed(Form("CRT Point %d", int(e)), ""));
+   marker->SetNextPoint(CRTX[spill][e],CRTY[spill][e],CRTZ[spill][e]);
+   marker->SetPointId(new TNamed(Form("CRT Point %d", int(e)), ""));
   }
   marker->SetElementName("CRT Hits");
   marker->SetMarkerSize(.4);
@@ -137,12 +137,12 @@ void LoadCRTHits(float min, float max)
 void LoadTPCHits()
 {
   if (event.empty()) {
-      gMultiView->DestroyEventRPhi();
+    gMultiView->DestroyEventRPhi();
 
-      gMultiView->DestroyEventRhoZ();
-      gEve->Redraw3D(kFALSE,kTRUE);
+    gMultiView->DestroyEventRhoZ();
+    gEve->Redraw3D(kFALSE,kTRUE);
 
-    return;
+   return;
   }
 
 
@@ -151,81 +151,81 @@ void LoadTPCHits()
   std::vector<double>::iterator it;
 
   if (ColorBySlice) {
-    color_ids = SliceID[spill];
-    unique_indices = SliceID[spill];
-    std::sort(unique_indices.begin(),unique_indices.end());
-    it = std::unique(unique_indices.begin(),unique_indices.end());
-    unique_indices.resize(std::distance(unique_indices.begin(),it));
+   color_ids = SliceID[spill];
+   unique_indices = SliceID[spill];
+   std::sort(unique_indices.begin(),unique_indices.end());
+   it = std::unique(unique_indices.begin(),unique_indices.end());
+   unique_indices.resize(std::distance(unique_indices.begin(),it));
   }
   else if (ColorByPFPs) {
-    color_ids = PFPID[spill];
-    unique_indices = PFPID[spill];
-    std::sort(unique_indices.begin(),unique_indices.end());
-    it = std::unique(unique_indices.begin(),unique_indices.end());
-    unique_indices.resize(std::distance(unique_indices.begin(),it));
+   color_ids = PFPID[spill];
+   unique_indices = PFPID[spill];
+   std::sort(unique_indices.begin(),unique_indices.end());
+   it = std::unique(unique_indices.begin(),unique_indices.end());
+   unique_indices.resize(std::distance(unique_indices.begin(),it));
   }
 
   int c = 0;
 
   for (int ID : unique_indices) {
-    if (c == 10 || c == 19) { c++; }
+   if (c == 10 || c == 19) { c++; }
 
-    auto marker = new TEvePointSet();
-    marker->SetOwnIds(kTRUE);
+   auto marker = new TEvePointSet();
+   marker->SetOwnIds(kTRUE);
 
-    int target = ID; 
-    std::vector<int> indices = findItems(color_ids, target);
-    int cryo;
-    for (auto &e: indices) {
+   int target = ID; 
+   std::vector<int> indices = findItems(color_ids, target);
+   int cryo;
+   for (auto &e: indices) {
 
-      if (color_ids[e] != ID) { continue; } 
+    if (color_ids[e] != ID) { continue; } 
 
-      if (!DrawPlane1 && PlaneID[spill][e] == 0) { continue; } 
-      if (!DrawPlane2 && PlaneID[spill][e] == 1) { continue; } 
-      if (!DrawPlane3 && PlaneID[spill][e] == 2) { continue; } 
+    if (!DrawPlane1 && PlaneID[spill][e] == 0) { continue; } 
+    if (!DrawPlane2 && PlaneID[spill][e] == 1) { continue; } 
+    if (!DrawPlane3 && PlaneID[spill][e] == 2) { continue; } 
 
-      marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
+    marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
 
-      if (X[spill][e] > 0) { cryo=1; }
-      else { cryo=0; }
-      marker->SetPointId(new TNamed(Form("Point %d CRYO %d", e, cryo), ""));
+    if (X[spill][e] > 0) { cryo=1; }
+    else { cryo=0; }
+    marker->SetPointId(new TNamed(Form("Point %d CRYO %d", e, cryo), ""));
 
-    }
+   }
 
-    marker->SetMarkerSize(.4);
-    marker->SetMarkerStyle(8);
-    marker->SetMainColor(1+c);
-    gEve->AddElement(marker);
-    auto top = gEve->GetCurrentEvent();
+   marker->SetMarkerSize(.4);
+   marker->SetMarkerStyle(8);
+   marker->SetMainColor(1+c);
+   gEve->AddElement(marker);
+   auto top = gEve->GetCurrentEvent();
 
-    gMultiView->DestroyEventRPhi();
-    gMultiView->ImportEventRPhi(top);
+   gMultiView->DestroyEventRPhi();
+   gMultiView->ImportEventRPhi(top);
 
-    gMultiView->DestroyEventRhoZ();
-    gMultiView->ImportEventRhoZ(top);
-    gEve->Redraw3D(kFALSE,kTRUE);
-    c++;
+   gMultiView->DestroyEventRhoZ();
+   gMultiView->ImportEventRhoZ(top);
+   gEve->Redraw3D(kFALSE,kTRUE);
+   c++;
   }
 }
 
 void doAdvanceSpill()
 {
   if (spill < nSpills - 1) {
-    spill++;
-    gEve->GetCurrentEvent()->DestroyElements();
-    LoadTPCHits();
-    runstring = run[spill];
-    eventstring = event[spill];
+   spill++;
+   gEve->GetCurrentEvent()->DestroyElements();
+   LoadTPCHits();
+   runstring = run[spill];
+   eventstring = event[spill];
   }
 }
 void doPreviousSpill()
 {
   if (spill > 0) {
-    spill--;
-    gEve->GetCurrentEvent()->DestroyElements();
-    LoadTPCHits();
-    runstring = run[spill];
-    eventstring = event[spill];
+   spill--;
+   gEve->GetCurrentEvent()->DestroyElements();
+   LoadTPCHits();
+   runstring = run[spill];
+   eventstring = event[spill];
   }
 }
 void doColorbySlice()
@@ -246,12 +246,12 @@ void doDrawCRTHits(bool pressed, float min, float max)
 {
   PlotCRTHits = pressed;
   if (PlotCRTHits) { 
-    LoadCRTHits(min, max); 
+   LoadCRTHits(min, max); 
   }
   else {
-    auto top = gEve->GetCurrentEvent(); 
-    auto child = top->FindChild("CRT Hits");
-    if (child) { child->Destroy(); }
+   auto top = gEve->GetCurrentEvent(); 
+   auto child = top->FindChild("CRT Hits");
+   if (child) { child->Destroy(); }
   }
 }
 void doUseSliceCuts(std::vector<int> cut_indices)
@@ -324,9 +324,9 @@ void GetSpectrumSelection()
 
   SpillCut thisCut = kNoSpillCut;
   if (useSpillCuts) {
-    for (auto cut : spillCutIndices) { 
-        thisCut = thisCut && spill_cuts[cut];
-    }
+   for (auto cut : spillCutIndices) { 
+      thisCut = thisCut && spill_cuts[cut];
+   }
   }
 
   Spectrum sFindSpill("",bins,loader,kFindEvents,thisCut,kSpillUnweighted);
@@ -336,101 +336,158 @@ void GetSpectrumSelection()
 
 void event_display(const std::string inputName)
 {
-   fname = inputName;
-   gSystem->Load("libGeom");
-   ///// Uncomment if you need to recreate the geometry file
-   /*
-   TGeoManager *geom = new TGeoManager("geom","ICARUS");
+  fname = inputName;
+  gSystem->Load("libGeom");
+  ///// Uncomment if you need to recreate the geometry file
+  /*
+  TGeoManager *geom = new TGeoManager("geom","ICARUS");
 
-   TGeoMaterial *Vacuum = new TGeoMaterial("vacuum",0,0,0);
-   TGeoMaterial *Fe = new TGeoMaterial("Aluminum",55.845,26,7.87);
+  TGeoMaterial *Vacuum = new TGeoMaterial("vacuum",0,0,0);
+  TGeoMaterial *Fe = new TGeoMaterial("Aluminum",55.845,26,7.87);
 
-   TGeoMedium *Air = new TGeoMedium("Air",0,Vacuum);
-   TGeoMedium *Iron = new TGeoMedium("Iron",0,Fe);
+  TGeoMedium *Air = new TGeoMedium("Air",0,Vacuum);
+  TGeoMedium *Iron = new TGeoMedium("Iron",0,Fe);
 
-   TGeoVolume *Phy_Building = geom->MakeBox("top",Air,600,600,2100);
-   geom->SetTopVolume(Phy_Building);
-   geom->SetTopVisible(0);
+  TGeoVolume *Phy_Building = geom->MakeBox("top",Air,600,600,2100);
+  geom->SetTopVolume(Phy_Building);
+  geom->SetTopVisible(0);
 
-   Double_t cryoPosX = 210.215;
-   //Double_t cryoPosY = -189.583+164.583;
-   Double_t cryoPosZ = 133.483-153.683;
-   Double_t cryoPosY = 0;
-   //Double_t cryoPosZ = 0;
-   Double_t tpcPosX = 74.745;
-   //Double_t tpcPosY = -492.475;
-   Double_t tpcPosZ = -3.25;
-   Double_t tpcPosY = 0;
-   //Double_t tpcPosZ = 0;
-   Double_t cryo_halfX = 400.43/2;
-   Double_t cryo_halfY = 1992.90/2;
-   Double_t cryo_halfZ = 426.82/2;
-   Double_t tpc_halfX = 149.34/2;
-   Double_t tpc_halfY = 984.95;
-   Double_t tpc_halfZ = 382.32/2;
+  Double_t cryoPosX = 210.215;
+  //Double_t cryoPosY = -189.583+164.583;
+  Double_t cryoPosZ = 133.483-153.683;
+  Double_t cryoPosY = 0;
+  //Double_t cryoPosZ = 0;
+  Double_t tpcPosX = 74.745;
+  //Double_t tpcPosY = -492.475;
+  Double_t tpcPosZ = -3.25;
+  Double_t tpcPosY = 0;
+  //Double_t tpcPosZ = 0;
+  Double_t cryo_halfX = 400.43/2;
+  Double_t cryo_halfY = 1992.90/2;
+  Double_t cryo_halfZ = 426.82/2;
+  Double_t tpc_halfX = 149.34/2;
+  Double_t tpc_halfY = 984.95;
+  Double_t tpc_halfZ = 382.32/2;
 
-   TGeoVolume *CRYO = geom->MakeBox("CRYO", Iron, cryo_halfX, cryo_halfZ, cryo_halfY);;
-   CRYO->SetLineColor(18);
-   CRYO->SetLineWidth(2);
-   CRYO->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(CRYO,1,new TGeoTranslation(-cryoPosX, cryoPosZ, cryoPosY));
-   Phy_Building->AddNodeOverlap(CRYO,2,new TGeoTranslation( cryoPosX, cryoPosZ, cryoPosY));
+  TGeoVolume *CRYO = geom->MakeBox("CRYO", Iron, cryo_halfX, cryo_halfZ, cryo_halfY);;
+  CRYO->SetLineColor(18);
+  CRYO->SetLineWidth(2);
+  CRYO->SetTransparency(90);
+  Phy_Building->AddNodeOverlap(CRYO,1,new TGeoTranslation(-cryoPosX, cryoPosZ, cryoPosY));
+  Phy_Building->AddNodeOverlap(CRYO,2,new TGeoTranslation( cryoPosX, cryoPosZ, cryoPosY));
 
-   TGeoVolume *TPC = geom->MakeBox("TPC", Iron, tpc_halfX, tpc_halfZ, tpc_halfY);;
-   TPC->SetLineColor(18);
-   TPC->SetLineWidth(2);
-   TPC->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(TPC,1,new TGeoTranslation(-cryoPosX-tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
-   Phy_Building->AddNodeOverlap(TPC,2,new TGeoTranslation(-cryoPosX+tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
-   Phy_Building->AddNodeOverlap(TPC,3,new TGeoTranslation( cryoPosX-tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
-   Phy_Building->AddNodeOverlap(TPC,4,new TGeoTranslation( cryoPosX+tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
+  TGeoVolume *TPC = geom->MakeBox("TPC", Iron, tpc_halfX, tpc_halfZ, tpc_halfY);;
+  TPC->SetLineColor(18);
+  TPC->SetLineWidth(2);
+  TPC->SetTransparency(90);
+  Phy_Building->AddNodeOverlap(TPC,1,new TGeoTranslation(-cryoPosX-tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
+  Phy_Building->AddNodeOverlap(TPC,2,new TGeoTranslation(-cryoPosX+tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
+  Phy_Building->AddNodeOverlap(TPC,3,new TGeoTranslation( cryoPosX-tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
+  Phy_Building->AddNodeOverlap(TPC,4,new TGeoTranslation( cryoPosX+tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
 
-   TEveManager::Create();
+  TGeoVolume *person = geom->MakeBox("person",Air,100,200,100);
+  person->SetInvisible();
+  Int_t color = 20;
 
-   TGeoNode* node = gGeoManager->GetTopNode();
-   TEveGeoTopNode* en   = new TEveGeoTopNode(gGeoManager, node);
-   en->SetVisLevel(4);
-   en->GetNode()->GetVolume()->SetVisibility(kFALSE);
-   en->GetNode()->GetVolume()->VisibleDaughters(kTRUE);
-   gEve->AddElement(en);
-   en->ExpandIntoListTreesRecursively();
-   en->SaveExtract("guitools/simple_ICARUS_geom.root","Gentle",kFALSE);
-   geom->CloseGeometry();
-   gGeoManager->SetNsegments(80);
-   
-   */
+  TGeoVolume* head = geom->MakeSphere("head", 0, 0, 10, 0, 90);
+  head->SetLineColor(color);
+  TGeoVolume* face = geom->MakeParaboloid("face", 0, 7, 10, 10);
+  face->SetLineColor(color);
+  TGeoVolume* neck = geom->MakeTube("neck", 0, 0, 5, 2.5);
+  neck->SetLineColor(color);
 
-   TEveManager::Create();
+  TGeoVolume* body = geom->MakeEltu("body", 0, 20, 10, 30);
+  body->SetLineColor(color);
 
-   TEveGeoShape *gentle_geom = 0;
+  TGeoVolume* joint1 = geom->MakeSphere("joint1", 0, 0, 5);
+  joint1->SetLineColor(color);
+  TGeoVolume* joint2 = geom->MakeSphere("joint2", 0, 0, 7.5);
+  joint2->SetLineColor(color);
 
-   auto file = TFile::Open("guitools/simple_ICARUS_geom.root");
-   if (!file) return;
-   auto gse = (TEveGeoShapeExtract*) file->Get("Gentle");
-   gentle_geom = TEveGeoShape::ImportShapeExtract(gse, 0);
-   file->Close();
-   gEve->AddGlobalElement(gentle_geom);
+  TGeoVolume* arm = geom->MakeTube("arm", 0, 0, 4, 15);
+  arm->SetLineColor(color);
 
-   gMultiView = new MultiView;
-   gMultiView->f3DView->GetGLViewer()->SetStyle(TGLRnrCtx::kOutline);
+  TGeoVolume* leg = geom->MakeTube("leg", 0, 0, 6, 20);
+  leg->SetLineColor(color);
 
-   gMultiView->SetDepth(-10);
-   gMultiView->ImportGeomRPhi(gentle_geom);
-   gMultiView->ImportGeomRhoZ(gentle_geom);
-   gMultiView->SetDepth(0);
+  TGeoVolume* foot  = geom->MakeTubs("foot", 0, 0, 5, 15, 0, 180);
+  foot->SetLineColor(color);
 
-   // Final stuff
-   //=============
+  person->AddNode(head, 1, new TGeoTranslation(0, 0, 80));
+  person->AddNode(face, 1, new TGeoTranslation(0, 0, 70));
+  person->AddNode(neck, 1, new TGeoTranslation(0, 0, 57.5));
+  person->AddNode(body, 1, new TGeoTranslation(0, 0, 25));
 
-   gEve->GetViewers()->SwitchColorSet();
-   gEve->GetDefaultGLViewer()->SetStyle(TGLRnrCtx::kOutline);
+  TGeoRotation* rot1 = new TGeoRotation("rot1", 0, 180, 0);
+  TGeoRotation* rot2 = new TGeoRotation("rot2", 0, -30, 0);
 
-   gEve->GetBrowser()->GetTabRight()->SetTab(1);
+  person->AddNode(joint1, 1, new TGeoTranslation(25, 0, 50));
+  person->AddNode(joint1, 2, new TGeoTranslation(-25, 0, 50));
+  person->AddNode(arm, 1, new TGeoTranslation(25, 0, 33));
+  person->AddNode(arm, 2, new TGeoTranslation(-25, 0, 33));
+  person->AddNode(joint1, 3, new TGeoTranslation(25, 0, 17));
+  person->AddNode(joint1, 4, new TGeoTranslation(-25, 0, 17));
+  person->AddNode(arm, 3, new TGeoCombiTrans(25, -7.5, 2, rot2));
+  person->AddNode(arm, 4, new TGeoCombiTrans(-25, -7.5, 2, rot2));
 
-   new MyMainFrame();
+  person->AddNode(joint2, 5, new TGeoTranslation(10, 0, -8));
+  person->AddNode(joint2, 6, new TGeoTranslation(-10, 0, -8));
+  person->AddNode(leg, 1, new TGeoTranslation(10, 0, -23));
+  person->AddNode(leg, 2, new TGeoTranslation(-10, 0, -23));
+  person->AddNode(joint2, 7, new TGeoTranslation(10, 0, -45));
+  person->AddNode(joint2, 8, new TGeoTranslation(-10, 0, -45));
+  person->AddNode(leg, 3, new TGeoTranslation(10, 0, -65));
+  person->AddNode(leg, 4, new TGeoTranslation(-10, 0, -65));
 
-   gEve->AddEvent(new TEveEventManager("Event", "ICARUS CAF Event"));
-   GetSpectrumSelection();
-   LoadTPCHits();
-   gEve->Redraw3D(kTRUE); // Reset camera after the first event has been shown.
+  TGeoRotation* rot3 = new TGeoRotation("rot3", 0, 90, 0);
+  person->AddNode(foot, 1, new TGeoCombiTrans(10, -8, -90, rot3));
+  person->AddNode(foot, 2, new TGeoCombiTrans(-10, -8, -90, rot3));
+  TGeoRotation* rot4 = new TGeoRotation("rot4", 0, 270, 0);
+  Phy_Building->AddNode(person, 0, new TGeoCombiTrans(-700, -160, 0, rot4)); // side north, 47 - mid East  
+
+  TEveManager::Create();
+  TGeoNode* node = gGeoManager->GetTopNode();
+  TEveGeoTopNode* en  = new TEveGeoTopNode(gGeoManager, node);
+  en->SetVisLevel(4);
+  en->GetNode()->GetVolume()->SetVisibility(kFALSE);
+  en->GetNode()->GetVolume()->VisibleDaughters(kTRUE);
+  gEve->AddElement(en);
+  en->ExpandIntoListTreesRecursively();
+  en->SaveExtract("guitools/simple_ICARUS_geom.root","Gentle",kFALSE);
+  geom->CloseGeometry();
+  gGeoManager->SetNsegments(80);
+  */
+  TEveManager::Create();
+
+  TEveGeoShape *gentle_geom = 0;
+  
+  auto file = TFile::Open("guitools/simple_ICARUS_geom.root");
+  if (!file) return;
+  auto gse = (TEveGeoShapeExtract*) file->Get("Gentle");
+  gentle_geom = TEveGeoShape::ImportShapeExtract(gse, 0);
+  file->Close();
+  gEve->AddGlobalElement(gentle_geom);
+
+  gMultiView = new MultiView;
+  gMultiView->f3DView->GetGLViewer()->SetStyle(TGLRnrCtx::kOutline);
+
+  gMultiView->SetDepth(-10);
+  gMultiView->ImportGeomRPhi(gentle_geom);
+  gMultiView->ImportGeomRhoZ(gentle_geom);
+  gMultiView->SetDepth(0);
+
+  // Final stuff
+  //=============
+
+  gEve->GetViewers()->SwitchColorSet();
+  gEve->GetDefaultGLViewer()->SetStyle(TGLRnrCtx::kOutline);
+
+  gEve->GetBrowser()->GetTabRight()->SetTab(1);
+
+  new MyMainFrame();
+
+  gEve->AddEvent(new TEveEventManager("Event", "ICARUS CAF Event"));
+  GetSpectrumSelection();
+  LoadTPCHits();
+  gEve->Redraw3D(kTRUE); // Reset camera after the first event has been shown.
 }
