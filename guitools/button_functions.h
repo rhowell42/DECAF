@@ -1,5 +1,5 @@
-void doAdvanceSpill();
-void doPreviousSpill();
+void doAdvanceSpill(float minTime, float maxTime);
+void doPreviousSpill(float minTime, float maxTime);
 void doUpdateStatusBar();
 
 void doColorbySlice();

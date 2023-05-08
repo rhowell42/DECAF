@@ -280,6 +280,7 @@ void LoadTPCHits()
    marker->SetMarkerSize(.4);
    marker->SetMarkerStyle(8);
    marker->SetMainColor(1+c);
+   marker->SetElementName("TPC Hits");
    gEve->AddElement(marker);
    auto top = gEve->GetCurrentEvent();
 
@@ -293,22 +294,34 @@ void LoadTPCHits()
   }
 }
 
-void doAdvanceSpill()
+void doAdvanceSpill(float min, float max)
 {
   if (spill < nSpills - 1) {
    spill++;
    gEve->GetCurrentEvent()->DestroyElements();
    LoadTPCHits();
+   if (PlotCRTHits) { 
+     LoadCRTHits(min, max); 
+   }
+   if (PlotFlashes) { 
+     LoadFlashes(min, max); 
+   }
    runstring = run[spill];
    eventstring = event[spill];
   }
 }
-void doPreviousSpill()
+void doPreviousSpill(float min, float max)
 {
   if (spill > 0) {
    spill--;
    gEve->GetCurrentEvent()->DestroyElements();
    LoadTPCHits();
+   if (PlotCRTHits) { 
+     LoadCRTHits(min, max); 
+   }
+   if (PlotFlashes) { 
+     LoadFlashes(min, max); 
+   }
    runstring = run[spill];
    eventstring = event[spill];
   }
@@ -317,19 +330,26 @@ void doColorbySlice()
 {
   ColorByPFPs = false;
   ColorBySlice = true;  
-  gEve->GetCurrentEvent()->DestroyElements();
+  auto top = gEve->GetCurrentEvent(); 
+  std::list<TEveElement*> children;
+  top->FindChildren(children,"TPC Hits");
+  for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
 }
 void doColorbyPFP()
 {
   ColorByPFPs = true;
   ColorBySlice = false;  
-  gEve->GetCurrentEvent()->DestroyElements();
+  auto top = gEve->GetCurrentEvent(); 
+  std::list<TEveElement*> children;
+  top->FindChildren(children,"TPC Hits");
+  for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
 }
 void doDrawCRTHits(bool pressed, float min, float max)
 {
   PlotCRTHits = pressed;
+  auto top = gEve->GetCurrentEvent(); 
   if (PlotCRTHits) { 
    LoadCRTHits(min, max); 
   }
@@ -342,6 +362,7 @@ void doDrawCRTHits(bool pressed, float min, float max)
 void doDrawFlashes(bool pressed, float min, float max)
 {
   PlotFlashes = pressed;
+  auto top = gEve->GetCurrentEvent(); 
   if (PlotFlashes) { 
    LoadFlashes(min, max); 
   }
@@ -357,7 +378,10 @@ void doUseSliceCuts(std::vector<int> cut_indices)
   useSliceCuts = true;
   sliceCutIndices = cut_indices;
   GetSpectrumSelection();
-  gEve->GetCurrentEvent()->DestroyElements();
+  auto top = gEve->GetCurrentEvent(); 
+  std::list<TEveElement*> children;
+  top->FindChildren(children,"TPC Hits");
+   for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
 }
 void doUseSpillCuts(std::vector<int> cut_indices)
@@ -365,32 +389,47 @@ void doUseSpillCuts(std::vector<int> cut_indices)
   useSpillCuts = true;
   spillCutIndices = cut_indices;
   GetSpectrumSelection();
-  gEve->GetCurrentEvent()->DestroyElements();
+  auto top = gEve->GetCurrentEvent(); 
+  std::list<TEveElement*> children;
+  top->FindChildren(children,"TPC Hits");
+   for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
 }
 void doUseNuSlice(bool pressed)
 {
   onlyNuSlice = pressed;
   GetSpectrumSelection();
-  gEve->GetCurrentEvent()->DestroyElements();
+  auto top = gEve->GetCurrentEvent(); 
+  std::list<TEveElement*> children;
+  top->FindChildren(children,"TPC Hits");
+   for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
 }
 void doDrawPlane1(bool pressed)
 {
   DrawPlane1 = pressed;
-  gEve->GetCurrentEvent()->DestroyElements();
+  auto top = gEve->GetCurrentEvent(); 
+  std::list<TEveElement*> children;
+  top->FindChildren(children,"TPC Hits");
+   for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
 }
 void doDrawPlane2(bool pressed)
 {
   DrawPlane2 = pressed;
-  gEve->GetCurrentEvent()->DestroyElements();
+  auto top = gEve->GetCurrentEvent(); 
+  std::list<TEveElement*> children;
+  top->FindChildren(children,"TPC Hits");
+   for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
 }
 void doDrawPlane3(bool pressed)
 {
   DrawPlane3 = pressed;
-  gEve->GetCurrentEvent()->DestroyElements();
+  auto top = gEve->GetCurrentEvent(); 
+  std::list<TEveElement*> children;
+  top->FindChildren(children,"TPC Hits");
+   for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
 }
 void doTimeSel(float min, float max)
