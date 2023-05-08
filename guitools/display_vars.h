@@ -30,7 +30,7 @@ bool onlyNuSlice = true;
 
 std::vector<int> sliceCutIndices;
 
-const SpillMultiVar kSLCVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+const SpillMultiVar kHITVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   int sliceID = 0;
   for (const auto& slc: sr->slc) {
@@ -61,7 +61,7 @@ const SpillMultiVar kSLCVARS([](const caf::SRSpillProxy* sr) -> std::vector<doub
   }
   return hits;
 });
-const SpillMultiVar kSRVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+const SpillMultiVar kCRTVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   for (const auto& hit : sr->crt_hits) {
     hits.push_back(hit.position.x);
@@ -69,6 +69,38 @@ const SpillMultiVar kSRVARS([](const caf::SRSpillProxy* sr) -> std::vector<doubl
     hits.push_back(hit.position.z);
     hits.push_back(hit.t1);
     hits.push_back(hit.plane);
+  }
+  return hits;
+});
+const SpillMultiVar kOPVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+  std::vector<double> hits;
+  int sliceID = 0;
+  for (const auto& slc: sr->slc) {
+    bool useSlice = true;
+    if (useSliceCuts) { 
+      for (const auto& i_cut : sliceCutIndices) { 
+        const auto& cut = slice_cuts[i_cut];
+        if (!cut(&slc)) { 
+          useSlice = false; 
+          break; 
+        } 
+      } 
+    }
+    if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
+    if (!useSlice) { continue; }
+    if (!slc.fmatch.present) { continue; }
+    const int x_pos = slc.fmatch.chargeCenter.x; // cm
+    int x = -999;
+    if (x_pos > 200.215) { x = 200.215+2*74.745; }
+    else if (x_pos > 0) { x = 200.215-2*74.745; }
+    else if (x_pos > -200.215) { x = -200.215+2*74.745; }
+    else { x = -200.215-2*74.745; }
+    hits.push_back(x);
+    hits.push_back(slc.fmatch.lightCenter.y);
+    hits.push_back(slc.fmatch.lightCenter.z);
+    hits.push_back(slc.fmatch.lightWidth.y);
+    hits.push_back(slc.fmatch.lightWidth.z);
+    hits.push_back(slc.fmatch.time);
   }
   return hits;
 });

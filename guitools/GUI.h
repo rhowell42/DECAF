@@ -157,6 +157,7 @@ private:
    TGRadioButton       *fRadiob[2];    // Radio buttons
    TGCheckButton       *fOnlyNuSlice;
    TGCheckButton       *fCRTHits;
+   TGCheckButton       *fOpFlashes;
    TGCheckButton       *fCheckPlane1;
    TGCheckButton       *fCheckPlane2;
    TGCheckButton       *fCheckPlane3;
@@ -180,6 +181,7 @@ public:
    void ColorbySlice();
    void ColorbyPFP();
    void DrawCRTHits();
+   void DrawFlashes();
    void CheckSliceCut();
    void CheckSpillCut();
    void CheckNuSlice();
@@ -236,6 +238,12 @@ MyMainFrame::MyMainFrame() {
    fCRTHits->Connect("Clicked()","MyMainFrame",this,"DrawCRTHits()");
    //fCRTHits->SetState(kButtonDown);
    controls->AddFrame(fCRTHits, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+
+   fOpFlashes = new TGCheckButton(controls,"Plot Matched Flashes");
+   fOpFlashes->Connect("Clicked()","MyMainFrame",this,"DrawFlashes()");
+   //fOpFlashes->SetState(kButtonDown);
+   controls->AddFrame(fOpFlashes, new TGLayoutHints(kLHintsTop|kLHintsLeft|
                                                        kLHintsExpandX,5,5,5,10));
 
    TGVButtonGroup *fhits = new TGVButtonGroup(controls, "Draw Hit Options");
@@ -392,6 +400,12 @@ void MyMainFrame::DrawCRTHits() {
   float min = fTimeSlider->GetMinPosition();
   float max  = fTimeSlider->GetMaxPosition();
   doDrawCRTHits(pressed, min, max); 
+}
+void MyMainFrame::DrawFlashes() {
+  bool pressed = fOpFlashes->GetState() == kButtonDown;
+  float min = fTimeSlider->GetMinPosition();
+  float max  = fTimeSlider->GetMaxPosition();
+  doDrawFlashes(pressed, min, max); 
 }
 void MyMainFrame::CheckPlane1() {
   bool pressed = fCheckPlane1->GetState() == kButtonDown;
