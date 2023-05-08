@@ -74,33 +74,23 @@ const SpillMultiVar kCRTVARS([](const caf::SRSpillProxy* sr) -> std::vector<doub
 });
 const SpillMultiVar kOPVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
-  int sliceID = 0;
-  for (const auto& slc: sr->slc) {
-    bool useSlice = true;
-    if (useSliceCuts) { 
-      for (const auto& i_cut : sliceCutIndices) { 
-        const auto& cut = slice_cuts[i_cut];
-        if (!cut(&slc)) { 
-          useSlice = false; 
-          break; 
-        } 
-      } 
-    }
-    if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
-    if (!useSlice) { continue; }
-    if (!slc.fmatch.present) { continue; }
-    const int x_pos = slc.fmatch.chargeCenter.x; // cm
-    int x = -999;
-    if (x_pos > 200.215) { x = 200.215+2*74.745; }
-    else if (x_pos > 0) { x = 200.215-2*74.745; }
-    else if (x_pos > -200.215) { x = -200.215+2*74.745; }
-    else { x = -200.215-2*74.745; }
+  for (const auto& hit : sr->opflashes) {
+    //const int x_pos = hit.center.x; // cm
+    //int x = -999;
+    //if (x_pos > 200.215) { x = 200.215+2*74.745; }
+    //else if (x_pos > 0) { x = 200.215-2*74.745; }
+    //else if (x_pos > -200.215) { x = -200.215+2*74.745; }
+    //else { x = -200.215-2*74.745; }
+    const int x_pos = hit.cryo; // cm
+    int x = 0;
+    if (x_pos == 1) {x = 200.215+2*74.745;}
+    else if (x_pos == 0) {x = -200.215-2*74.745;}
     hits.push_back(x);
-    hits.push_back(slc.fmatch.lightCenter.y);
-    hits.push_back(slc.fmatch.lightCenter.z);
-    hits.push_back(slc.fmatch.lightWidth.y);
-    hits.push_back(slc.fmatch.lightWidth.z);
-    hits.push_back(slc.fmatch.time);
+    hits.push_back(hit.center.y);
+    hits.push_back(hit.center.z);
+    hits.push_back(hit.width.y);
+    hits.push_back(hit.width.z);
+    hits.push_back(hit.time);
   }
   return hits;
 });

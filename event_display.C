@@ -59,7 +59,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   std::vector<double> crttimearray;
   std::vector<double> crtplanearray;
 
-  std::vector<double> flashtpcarray;
+  std::vector<double> flashxarray;
   std::vector<double> flashyarray;
   std::vector<double> flashzarray;
   std::vector<double> flashwidthyarray;
@@ -84,7 +84,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   }
 
   for (size_t i = 0; i<opvars.size()-kFlashEnd; i+=kFlashEnd) {
-   flashtpcarray.push_back(opvars[i+flashtpc]);
+   flashxarray.push_back(opvars[i+flashx]);
    flashyarray.push_back(opvars[i+flashy]);
    flashzarray.push_back(opvars[i+flashz]);
    flashtimearray.push_back(opvars[i+flashtime]);
@@ -105,7 +105,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   CRTTime.push_back(crttimearray);
   CRTPlane.push_back(crtplanearray);
 
-  FlashTPC.push_back(flashtpcarray);
+  FlashX.push_back(flashxarray);
   FlashY.push_back(flashyarray);
   FlashZ.push_back(flashzarray);
   FlashTime.push_back(flashtimearray);
@@ -132,32 +132,39 @@ void LoadFlashes(float min, float max)
   }
 
   auto top = gEve->GetCurrentEvent(); 
-  auto child = top->FindChild("Op Flashes");
-  if (child) { child->Destroy(); }
+  std::list<TEveElement*> children;
+  top->FindChildren(children,"Op Flashes");
+  for (auto const& child : children) { if (child) { child->Destroy(); } }
 
   int c = 0;
 
-  for (size_t e = 0; e<CRTX[spill].size(); e++) {
+  for (size_t e = 0; e<FlashTime[spill].size(); e++) {
    if (FlashTime[spill][e] < min || FlashTime[spill][e] > max) { continue; }
    if (c == 10 || c == 19) { c++; }
 
-   auto box = new TEveBox;
-   box->SetMainColor(c);
 
-   Float_t x = FlashTPC[spill][e], y = FlashY[spill][e], z = FlashZ[spill][e];
+   Float_t x = FlashX[spill][e], y = FlashY[spill][e], z = FlashZ[spill][e];
    Float_t y_width = FlashWidthY[spill][e], z_width = FlashWidthZ[spill][e];
 
+   if (abs(x) == 0) {continue;}
+   if (abs(y_width) <= 2 || abs(y_width) >= 680 || abs(z_width) <= 2 || abs(z_width) >= 680 ) {continue;}
+   if (isnan(y) || isnan(z)) {continue;}
+   if (isnan(y_width) || isnan(z_width)) {continue;}
+   if (isinf(y) || isinf(z)) {continue;}
+   if (isinf(y_width) || isinf(z_width)) {continue;}
 
-   if (abs(y_width) <= 1 || abs(y_width) >= 685.5 || abs(z_width) <= 1 || abs(z_width) >= 685.6 ) {continue;}
+   auto box = new TEveBox;
+   box->SetMainColor(c);
+   box->SetMainTransparency(50);
 
-   box->SetVertex(0, x-5, y - y_width/2, z - z_width/2);
-   box->SetVertex(1, x-5, y + y_width/2, z - z_width/2);
-   box->SetVertex(2, x+5, y + y_width/2, z - z_width/2);
-   box->SetVertex(3, x+5, y - y_width/2, z - z_width/2);
-   box->SetVertex(4, x-5, y - y_width/2, z + z_width/2);
-   box->SetVertex(5, x-5, y + y_width/2, z + z_width/2);
-   box->SetVertex(6, x+5, y + y_width/2, z + z_width/2);
-   box->SetVertex(7, x+5, y - y_width/2, z + z_width/2);
+   box->SetVertex(0, x-1, y - y_width/2, z - z_width/2);
+   box->SetVertex(1, x-1, y + y_width/2, z - z_width/2);
+   box->SetVertex(2, x+1, y + y_width/2, z - z_width/2);
+   box->SetVertex(3, x+1, y - y_width/2, z - z_width/2);
+   box->SetVertex(4, x-1, y - y_width/2, z + z_width/2);
+   box->SetVertex(5, x-1, y + y_width/2, z + z_width/2);
+   box->SetVertex(6, x+1, y + y_width/2, z + z_width/2);
+   box->SetVertex(7, x+1, y - y_width/2, z + z_width/2);
 
    box->SetElementName("Op Flashes");
    gEve->AddElement(box);
@@ -340,8 +347,9 @@ void doDrawFlashes(bool pressed, float min, float max)
   }
   else {
    auto top = gEve->GetCurrentEvent(); 
-   auto child = top->FindChild("Op Flashes");
-   if (child) { child->Destroy(); }
+   std::list<TEveElement*> children;
+   top->FindChildren(children,"Op Flashes");
+   for (auto const& child : children) { if (child) { child->Destroy(); } }
   }
 }
 void doUseSliceCuts(std::vector<int> cut_indices)
@@ -405,6 +413,13 @@ void GetSpectrumSelection()
   CRTZ.clear();
   CRTTime.clear();
   CRTPlane.clear();
+
+  FlashX.clear();
+  FlashY.clear();
+  FlashZ.clear();
+  FlashTime.clear();
+  FlashWidthY.clear();
+  FlashWidthZ.clear();
 
   run.clear();
   event.clear();
