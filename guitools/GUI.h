@@ -348,7 +348,7 @@ void MyMainFrame::DoClose() {
 }
 
 void MyMainFrame::AdvanceSpill() {
-  doAdvanceSpill(); 
+  doAdvanceSpill(fTimeSlider->GetMinPosition(),fTimeSlider->GetMaxPosition());
   char s[250] = {0};
   sprintf(s, "Run: %d",runstring);
   fEventHeader->SetText(s,0);
@@ -356,7 +356,7 @@ void MyMainFrame::AdvanceSpill() {
   fEventHeader->SetText(s,1);
 }
 void MyMainFrame::PreviousSpill() {
-  doPreviousSpill(); 
+  doPreviousSpill(fTimeSlider->GetMinPosition(),fTimeSlider->GetMaxPosition());
   char s[250] = {0};
   sprintf(s, "Run: %d",runstring);
   fEventHeader->SetText(s,0);
