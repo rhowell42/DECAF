@@ -30,7 +30,7 @@ bool onlyNuSlice = true;
 
 std::vector<int> sliceCutIndices;
 
-const SpillMultiVar kSLCVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+const SpillMultiVar kHITVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   int sliceID = 0;
   for (const auto& slc: sr->slc) {
@@ -61,7 +61,7 @@ const SpillMultiVar kSLCVARS([](const caf::SRSpillProxy* sr) -> std::vector<doub
   }
   return hits;
 });
-const SpillMultiVar kSRVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+const SpillMultiVar kCRTVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   for (const auto& hit : sr->crt_hits) {
     hits.push_back(hit.position.x);
@@ -69,6 +69,28 @@ const SpillMultiVar kSRVARS([](const caf::SRSpillProxy* sr) -> std::vector<doubl
     hits.push_back(hit.position.z);
     hits.push_back(hit.t1);
     hits.push_back(hit.plane);
+  }
+  return hits;
+});
+const SpillMultiVar kOPVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+  std::vector<double> hits;
+  for (const auto& hit : sr->opflashes) {
+    //const int x_pos = hit.center.x; // cm
+    //int x = -999;
+    //if (x_pos > 200.215) { x = 200.215+2*74.745; }
+    //else if (x_pos > 0) { x = 200.215-2*74.745; }
+    //else if (x_pos > -200.215) { x = -200.215+2*74.745; }
+    //else { x = -200.215-2*74.745; }
+    const int x_pos = hit.cryo; // cm
+    int x = 0;
+    if (x_pos == 1) {x = 200.215+2*74.745;}
+    else if (x_pos == 0) {x = -200.215-2*74.745;}
+    hits.push_back(x);
+    hits.push_back(hit.center.y);
+    hits.push_back(hit.center.z);
+    hits.push_back(hit.width.y);
+    hits.push_back(hit.width.z);
+    hits.push_back(hit.time);
   }
   return hits;
 });

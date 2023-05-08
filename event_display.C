@@ -18,6 +18,7 @@
 #include "TGLRnrCtx.h"
 #include "TGeoManager.h"
 #include "TEveGeoShape.h"
+#include "TEveBox.h"
 #include "TGeoVolume.h"
 #include "TGeoMedium.h"
 #include "TEveGeoNode.h"
@@ -37,10 +38,11 @@
 using namespace ana;
 
 const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
-  slcvars = kSLCVARS(sr);
-  srvars = kSRVARS(sr);
+  hitvars = kHITVARS(sr);
+  crtvars = kCRTVARS(sr);
+  opvars = kOPVARS(sr);
 
-  if (slcvars.empty() || srvars.empty()) {
+  if (hitvars.empty() || crtvars.empty() || opvars.empty()) {
    return 42;
   }
 
@@ -57,21 +59,37 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   std::vector<double> crttimearray;
   std::vector<double> crtplanearray;
 
-  for (size_t i = 0; i<slcvars.size()-kSlcEnd; i+=kSlcEnd) {
-   xarray.push_back(slcvars[i+x]);
-   yarray.push_back(slcvars[i+y]);
-   zarray.push_back(slcvars[i+z]);
-   pfparray.push_back(slcvars[i+kpfp]);
-   slicearray.push_back(slcvars[i+kslice]);
-   planeidarray.push_back(slcvars[i+kplaneid]);
+  std::vector<double> flashxarray;
+  std::vector<double> flashyarray;
+  std::vector<double> flashzarray;
+  std::vector<double> flashwidthyarray;
+  std::vector<double> flashwidthzarray;
+  std::vector<double> flashtimearray;
+
+  for (size_t i = 0; i<hitvars.size()-kHitEnd; i+=kHitEnd) {
+   xarray.push_back(hitvars[i+x]);
+   yarray.push_back(hitvars[i+y]);
+   zarray.push_back(hitvars[i+z]);
+   pfparray.push_back(hitvars[i+kpfp]);
+   slicearray.push_back(hitvars[i+kslice]);
+   planeidarray.push_back(hitvars[i+kplaneid]);
   }
 
-  for (size_t i = 0; i<srvars.size()-kSrEnd; i+=kSrEnd) {
-   crtxarray.push_back(srvars[i+crtx]);
-   crtyarray.push_back(srvars[i+crty]);
-   crtzarray.push_back(srvars[i+crtz]);
-   crttimearray.push_back(srvars[i+crttime]);
-   crtplanearray.push_back(srvars[i+crtplane]);
+  for (size_t i = 0; i<crtvars.size()-kCRTEnd; i+=kCRTEnd) {
+   crtxarray.push_back(crtvars[i+crtx]);
+   crtyarray.push_back(crtvars[i+crty]);
+   crtzarray.push_back(crtvars[i+crtz]);
+   crttimearray.push_back(crtvars[i+crttime]);
+   crtplanearray.push_back(crtvars[i+crtplane]);
+  }
+
+  for (size_t i = 0; i<opvars.size()-kFlashEnd; i+=kFlashEnd) {
+   flashxarray.push_back(opvars[i+flashx]);
+   flashyarray.push_back(opvars[i+flashy]);
+   flashzarray.push_back(opvars[i+flashz]);
+   flashtimearray.push_back(opvars[i+flashtime]);
+   flashwidthyarray.push_back(opvars[i+flashwidthy]);
+   flashwidthzarray.push_back(opvars[i+flashwidthz]);
   }
 
   X.push_back(xarray);
@@ -87,6 +105,13 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   CRTTime.push_back(crttimearray);
   CRTPlane.push_back(crtplanearray);
 
+  FlashX.push_back(flashxarray);
+  FlashY.push_back(flashyarray);
+  FlashZ.push_back(flashzarray);
+  FlashTime.push_back(flashtimearray);
+  FlashWidthY.push_back(flashwidthyarray);
+  FlashWidthZ.push_back(flashwidthzarray);
+
   run.push_back(kRun(sr));
   event.push_back(kEvt(sr));
 
@@ -94,6 +119,66 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
 
   return 42;
 });
+
+void LoadFlashes(float min, float max)
+{
+  if (event.empty()) {
+    gMultiView->DestroyEventRPhi();
+
+    gMultiView->DestroyEventRhoZ();
+    gEve->Redraw3D(kFALSE,kTRUE);
+
+   return;
+  }
+
+  auto top = gEve->GetCurrentEvent(); 
+  std::list<TEveElement*> children;
+  top->FindChildren(children,"Op Flashes");
+  for (auto const& child : children) { if (child) { child->Destroy(); } }
+
+  int c = 0;
+
+  for (size_t e = 0; e<FlashTime[spill].size(); e++) {
+   if (FlashTime[spill][e] < min || FlashTime[spill][e] > max) { continue; }
+   if (c == 10 || c == 19) { c++; }
+
+
+   Float_t x = FlashX[spill][e], y = FlashY[spill][e], z = FlashZ[spill][e];
+   Float_t y_width = FlashWidthY[spill][e], z_width = FlashWidthZ[spill][e];
+
+   if (abs(x) == 0) {continue;}
+   if (abs(y_width) <= 2 || abs(y_width) >= 680 || abs(z_width) <= 2 || abs(z_width) >= 680 ) {continue;}
+   if (isnan(y) || isnan(z)) {continue;}
+   if (isnan(y_width) || isnan(z_width)) {continue;}
+   if (isinf(y) || isinf(z)) {continue;}
+   if (isinf(y_width) || isinf(z_width)) {continue;}
+
+   auto box = new TEveBox;
+   box->SetMainColor(c);
+   box->SetMainTransparency(50);
+
+   box->SetVertex(0, x-1, y - y_width/2, z - z_width/2);
+   box->SetVertex(1, x-1, y + y_width/2, z - z_width/2);
+   box->SetVertex(2, x+1, y + y_width/2, z - z_width/2);
+   box->SetVertex(3, x+1, y - y_width/2, z - z_width/2);
+   box->SetVertex(4, x-1, y - y_width/2, z + z_width/2);
+   box->SetVertex(5, x-1, y + y_width/2, z + z_width/2);
+   box->SetVertex(6, x+1, y + y_width/2, z + z_width/2);
+   box->SetVertex(7, x+1, y - y_width/2, z + z_width/2);
+
+   box->SetElementName("Op Flashes");
+   gEve->AddElement(box);
+   auto top = gEve->GetCurrentEvent();
+
+   gMultiView->DestroyEventRPhi();
+   gMultiView->ImportEventRPhi(top);
+
+   gMultiView->DestroyEventRhoZ();
+   gMultiView->ImportEventRhoZ(top);
+   gEve->Redraw3D(kFALSE,kTRUE);
+   c++;
+  }
+}
 
 void LoadCRTHits(float min, float max)
 {
@@ -254,6 +339,19 @@ void doDrawCRTHits(bool pressed, float min, float max)
    if (child) { child->Destroy(); }
   }
 }
+void doDrawFlashes(bool pressed, float min, float max)
+{
+  PlotFlashes = pressed;
+  if (PlotFlashes) { 
+   LoadFlashes(min, max); 
+  }
+  else {
+   auto top = gEve->GetCurrentEvent(); 
+   std::list<TEveElement*> children;
+   top->FindChildren(children,"Op Flashes");
+   for (auto const& child : children) { if (child) { child->Destroy(); } }
+  }
+}
 void doUseSliceCuts(std::vector<int> cut_indices)
 {
   useSliceCuts = true;
@@ -298,6 +396,7 @@ void doDrawPlane3(bool pressed)
 void doTimeSel(float min, float max)
 {
   if (PlotCRTHits) { LoadCRTHits(min, max); }
+  if (PlotFlashes) { LoadFlashes(min, max); }
 }
 
 void GetSpectrumSelection()
@@ -314,6 +413,13 @@ void GetSpectrumSelection()
   CRTZ.clear();
   CRTTime.clear();
   CRTPlane.clear();
+
+  FlashX.clear();
+  FlashY.clear();
+  FlashZ.clear();
+  FlashTime.clear();
+  FlashWidthY.clear();
+  FlashWidthZ.clear();
 
   run.clear();
   event.clear();
