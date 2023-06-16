@@ -41,10 +41,6 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
   trackvars = kTRACKVARS(sr);
   showervars = kSHOWERVARS(sr);
 
-  if (hitvars.empty() || crtvars.empty() || opvars.empty() || showervars.empty() || trackvars.empty()) {
-    return 42;
-  }
-
   std::vector<double>xarray;
   std::vector<double>yarray;
   std::vector<double>zarray;
@@ -85,15 +81,24 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
   std::vector<double>showerPFParray;
   std::vector<double>showerSlicearray;
 
-  for (size_t i = 0; i < hitvars.size() - kHitEnd; i += kHitEnd) {
-    xarray.push_back(hitvars[i + x]);
-    yarray.push_back(hitvars[i + y]);
-    zarray.push_back(hitvars[i + z]);
-    pfparray.push_back(hitvars[i + kpfp]);
-    slicearray.push_back(hitvars[i + kslice]);
-    planeidarray.push_back(hitvars[i + kplaneid]);
-  }
+  if (!hitvars.empty()) {
+    for (size_t i = 0; i < hitvars.size() - kHitEnd; i += kHitEnd) {
+      xarray.push_back(hitvars[i + x]);
+      yarray.push_back(hitvars[i + y]);
+      zarray.push_back(hitvars[i + z]);
+      pfparray.push_back(hitvars[i + kpfp]);
+      slicearray.push_back(hitvars[i + kslice]);
+      planeidarray.push_back(hitvars[i + kplaneid]);
+    }
 
+    X.push_back(xarray);
+    Y.push_back(yarray);
+    Z.push_back(zarray);
+    PFPID.push_back(pfparray);
+    SliceID.push_back(slicearray);
+    PlaneID.push_back(planeidarray);
+  }
+  if (!crtvars.empty()) {
   for (size_t i = 0; i < crtvars.size() - kCRTEnd; i += kCRTEnd) {
     crtxarray.push_back(crtvars[i + crtx]);
     crtyarray.push_back(crtvars[i + crty]);
@@ -102,6 +107,14 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
     crtplanearray.push_back(crtvars[i + crtplane]);
   }
 
+  CRTX.push_back(crtxarray);
+  CRTY.push_back(crtyarray);
+  CRTZ.push_back(crtzarray);
+  CRTTime.push_back(crttimearray);
+  CRTPlane.push_back(crtplanearray);
+  }
+
+  if (!opvars.empty()) {
   for (size_t i = 0; i < opvars.size() - kFlashEnd; i += kFlashEnd) {
     flashxarray.push_back(opvars[i + flashx]);
     flashyarray.push_back(opvars[i + flashy]);
@@ -111,6 +124,15 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
     flashwidthzarray.push_back(opvars[i + flashwidthz]);
   }
 
+  FlashX.push_back(flashxarray);
+  FlashY.push_back(flashyarray);
+  FlashZ.push_back(flashzarray);
+  FlashTime.push_back(flashtimearray);
+  FlashWidthY.push_back(flashwidthyarray);
+  FlashWidthZ.push_back(flashwidthzarray);
+  }
+
+  if (!trackvars.empty()) {
   for (size_t i = 0; i < trackvars.size() - kTrackEnd; i += kTrackEnd) {
     trackStartXarray.push_back(trackvars[i + trackstartx]);
     trackStartYarray.push_back(trackvars[i + trackstarty]);
@@ -120,9 +142,19 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
     trackEndZarray.push_back(trackvars[i + trackendz]);
     trackPFParray.push_back(trackvars[i + trackpfp]);
     trackSlicearray.push_back(trackvars[i + trackslice]);
-
   }
 
+  TrackStartX.push_back(trackStartXarray);
+  TrackStartY.push_back(trackStartYarray);
+  TrackStartZ.push_back(trackStartZarray);
+  TrackEndX.push_back(trackEndXarray);
+  TrackEndY.push_back(trackEndYarray);
+  TrackEndZ.push_back(trackEndZarray);
+  TrackPFP.push_back(trackPFParray);
+  TrackSlice.push_back(trackSlicearray);
+  }
+
+  if (!showervars.empty()) {
   for (size_t i = 0; i < showervars.size() - kShowerEnd; i += kShowerEnd) {
     showerStartXarray.push_back(showervars[i + showerstartx]);
     showerStartYarray.push_back(showervars[i + showerstarty]);
@@ -136,35 +168,6 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
     showerSlicearray.push_back(showervars[i + showerslice]);
   }
 
-  X.push_back(xarray);
-  Y.push_back(yarray);
-  Z.push_back(zarray);
-  PFPID.push_back(pfparray);
-  SliceID.push_back(slicearray);
-  PlaneID.push_back(planeidarray);
-
-  CRTX.push_back(crtxarray);
-  CRTY.push_back(crtyarray);
-  CRTZ.push_back(crtzarray);
-  CRTTime.push_back(crttimearray);
-  CRTPlane.push_back(crtplanearray);
-
-  FlashX.push_back(flashxarray);
-  FlashY.push_back(flashyarray);
-  FlashZ.push_back(flashzarray);
-  FlashTime.push_back(flashtimearray);
-  FlashWidthY.push_back(flashwidthyarray);
-  FlashWidthZ.push_back(flashwidthzarray);
-
-  TrackStartX.push_back(trackStartXarray);
-  TrackStartY.push_back(trackStartYarray);
-  TrackStartZ.push_back(trackStartZarray);
-  TrackEndX.push_back(trackEndXarray);
-  TrackEndY.push_back(trackEndYarray);
-  TrackEndZ.push_back(trackEndZarray);
-  TrackPFP.push_back(trackPFParray);
-  TrackSlice.push_back(trackSlicearray);
-
   ShowerStartX.push_back(showerStartXarray);
   ShowerStartY.push_back(showerStartYarray);
   ShowerStartZ.push_back(showerStartZarray);
@@ -175,12 +178,12 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
   ShowerAngle.push_back(showerAnglearray);
   ShowerPFP.push_back(showerPFParray);
   ShowerSlice.push_back(showerSlicearray);
+  }
 
   run.push_back(kRun(sr));
   event.push_back(kEvt(sr));
 
   nSpills++;
-
   return 42;
 });
 
@@ -204,8 +207,8 @@ void LoadReco() {
     }
   }
 
+  if (!TrackStartX.empty()) {
   int c = 0;
-
   for (size_t e = 0; e < TrackStartX[spill].size(); e++) {
     if (c == 10 || c == 19) {
       c++;
@@ -224,6 +227,7 @@ void LoadReco() {
     line->SetElementName("Reco");
 
     gEve->AddElement(line);
+  }
     top = gEve->GetCurrentEvent();
 
     gMultiView->DestroyEventRPhi();
@@ -234,14 +238,11 @@ void LoadReco() {
     gEve->Redraw3D(kFALSE, kTRUE);
     c++;
   }
-
   TEveBoxSet *showers = new TEveBoxSet;
   showers->Reset(TEveBoxSet::kBT_Cone, kFALSE, 64);
   TEveVector pos, dir;
+  if (!ShowerStartX.empty()) {
   for (size_t e = 0; e < ShowerStartX[spill].size(); e++) {
-    if (c == 10 || c == 19) {
-      c++;
-    }
 
     pos.Set(ShowerStartX[spill][e], ShowerStartY[spill][e], ShowerStartZ[spill][e]);
     dir.Set(ShowerDirX[spill][e], ShowerDirY[spill][e], ShowerDirZ[spill][e]);
@@ -259,6 +260,8 @@ void LoadReco() {
   showers->SetElementName("Reco");
   showers->RefitPlex();
   gEve->AddElement(showers);
+  }
+
   top = gEve->GetCurrentEvent();
 
   gMultiView->DestroyEventRPhi();
@@ -267,6 +270,7 @@ void LoadReco() {
   gMultiView->DestroyEventRhoZ();
   gMultiView->ImportEventRhoZ(top);
   gEve->Redraw3D(kFALSE, kTRUE);
+  
 }
 
 void LoadFlashes(float min, float max) {
@@ -289,6 +293,7 @@ void LoadFlashes(float min, float max) {
     }
   }
 
+  if (!FlashTime.empty()) {
   int c = 0;
 
   for (size_t e = 0; e < FlashTime[spill].size(); e++) {
@@ -336,6 +341,8 @@ void LoadFlashes(float min, float max) {
 
     box->SetElementName("Op Flashes");
     gEve->AddElement(box);
+    }
+
     auto top = gEve->GetCurrentEvent();
 
     gMultiView->DestroyEventRPhi();
@@ -364,9 +371,10 @@ void LoadCRTHits(float min, float max) {
     child->Destroy();
   }
 
+  if (!CRTX.empty()) {
   auto marker = new TEvePointSet();
   marker->SetOwnIds(kTRUE);
-
+  
   for (size_t e = 0; e < CRTX[spill].size(); e++) {
     if (CRTTime[spill][e] < min || CRTTime[spill][e] > max) {
       continue;
@@ -380,8 +388,10 @@ void LoadCRTHits(float min, float max) {
   marker->SetMarkerStyle(8);
   marker->SetMainColor(1);
   gEve->AddElement(marker);
-  top = gEve->GetCurrentEvent();
+  }
 
+  top = gEve->GetCurrentEvent();
+  
   gMultiView->DestroyEventRPhi();
   gMultiView->ImportEventRPhi(top);
 
@@ -399,7 +409,7 @@ void LoadTPCHits() {
 
     return;
   }
-
+  if (!SliceID.empty()) {
   std::vector<double>color_ids;
   std::vector<double>unique_indices;
   std::vector<double>::iterator it;
@@ -463,6 +473,7 @@ void LoadTPCHits() {
     marker->SetMainColor(1 + c);
     marker->SetElementName("TPC Hits");
     gEve->AddElement(marker);
+  }
     auto top = gEve->GetCurrentEvent();
 
     gMultiView->DestroyEventRPhi();
@@ -754,7 +765,7 @@ void GetSpectrumSelection() {
   loader.Go();
 }
 
-void event_display_test(const std::string inputName) {
+void event_display(const std::string inputName) {
   fname = inputName;
   gSystem->Load("libGeom");
   ///// Uncomment if you need to recreate the geometry file
