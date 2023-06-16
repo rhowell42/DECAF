@@ -75,12 +75,6 @@ const SpillMultiVar kCRTVARS([](const caf::SRSpillProxy* sr) -> std::vector<doub
 const SpillMultiVar kOPVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   for (const auto& hit : sr->opflashes) {
-    //const int x_pos = hit.center.x; // cm
-    //int x = -999;
-    //if (x_pos > 200.215) { x = 200.215+2*74.745; }
-    //else if (x_pos > 0) { x = 200.215-2*74.745; }
-    //else if (x_pos > -200.215) { x = -200.215+2*74.745; }
-    //else { x = -200.215-2*74.745; }
     const int x_pos = hit.cryo; // cm
     int x = 0;
     if (x_pos == 1) {x = 200.215+2*74.745;}
