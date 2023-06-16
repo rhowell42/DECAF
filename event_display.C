@@ -1,15 +1,12 @@
-#define GET_VARIABLE_NAME(Variable) (#Variable)
+#define GET_VARIABLE_NAME(Variable)(#Variable)
 
 #include "sbnana/CAFAna/Core/SpectrumLoader.h"
 #include "sbnana/CAFAna/Core/Spectrum.h"
-
 #include "sbnana/CAFAna/Core/Binning.h"
-
 #include "guitools/display_vars.h"
 #include "guitools/GUI.h"
 #include "guitools/MultiView.h"
 #include "tools/plot_tools.h"
-
 #include "TFile.h"
 #include "TStyle.h"
 #include "TEveViewer.h"
@@ -25,21 +22,19 @@
 #include "TEveLine.h"
 #include "TEveBoxSet.h"
 #include <TEveManager.h>
- 
 #include <TEveViewer.h>
 #include <TGLViewer.h>
- 
 #include <TEveScene.h>
- 
 #include <TEveProjectionManager.h>
 #include <TEveProjectionAxes.h>
-#include <TEveEventManager.h> 
+#include <TEveEventManager.h>
 #include <TEveBrowser.h>
 #include <TEveWindow.h>
 #include "TMarker3DBox.h"
+
 using namespace ana;
 
-const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
+const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
   hitvars = kHITVARS(sr);
   crtvars = kCRTVARS(sr);
   opvars = kOPVARS(sr);
@@ -47,98 +42,98 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   showervars = kSHOWERVARS(sr);
 
   if (hitvars.empty() || crtvars.empty() || opvars.empty() || showervars.empty() || trackvars.empty()) {
-   return 42;
+    return 42;
   }
 
-  std::vector<double> xarray;
-  std::vector<double> yarray;
-  std::vector<double> zarray;
-  std::vector<double> pfparray;
-  std::vector<double> slicearray;
-  std::vector<double> planeidarray;
+  std::vector < double > xarray;
+  std::vector < double > yarray;
+  std::vector < double > zarray;
+  std::vector < double > pfparray;
+  std::vector < double > slicearray;
+  std::vector < double > planeidarray;
 
-  std::vector<double> crtxarray;
-  std::vector<double> crtyarray;
-  std::vector<double> crtzarray;
-  std::vector<double> crttimearray;
-  std::vector<double> crtplanearray;
+  std::vector < double > crtxarray;
+  std::vector < double > crtyarray;
+  std::vector < double > crtzarray;
+  std::vector < double > crttimearray;
+  std::vector < double > crtplanearray;
 
-  std::vector<double> flashxarray;
-  std::vector<double> flashyarray;
-  std::vector<double> flashzarray;
-  std::vector<double> flashwidthyarray;
-  std::vector<double> flashwidthzarray;
-  std::vector<double> flashtimearray;
+  std::vector < double > flashxarray;
+  std::vector < double > flashyarray;
+  std::vector < double > flashzarray;
+  std::vector < double > flashwidthyarray;
+  std::vector < double > flashwidthzarray;
+  std::vector < double > flashtimearray;
 
-  std::vector<double>  trackStartXarray;
-  std::vector<double>  trackStartYarray;
-  std::vector<double>  trackStartZarray;
-  std::vector<double>  trackEndXarray;
-  std::vector<double>  trackEndYarray;
-  std::vector<double>  trackEndZarray;
-  std::vector<double>  trackPFParray;
-  std::vector<double>  trackSlicearray;
+  std::vector < double > trackStartXarray;
+  std::vector < double > trackStartYarray;
+  std::vector < double > trackStartZarray;
+  std::vector < double > trackEndXarray;
+  std::vector < double > trackEndYarray;
+  std::vector < double > trackEndZarray;
+  std::vector < double > trackPFParray;
+  std::vector < double > trackSlicearray;
 
-  std::vector<double>  showerStartXarray;
-  std::vector<double>  showerStartYarray;
-  std::vector<double>  showerStartZarray;
-  std::vector<double>  showerDirXarray;
-  std::vector<double>  showerDirYarray;
-  std::vector<double>  showerDirZarray;
-  std::vector<double>  showerLengtharray;
-  std::vector<double>  showerAnglearray;
-  std::vector<double>  showerPFParray;
-  std::vector<double>  showerSlicearray;
+  std::vector < double > showerStartXarray;
+  std::vector < double > showerStartYarray;
+  std::vector < double > showerStartZarray;
+  std::vector < double > showerDirXarray;
+  std::vector < double > showerDirYarray;
+  std::vector < double > showerDirZarray;
+  std::vector < double > showerLengtharray;
+  std::vector < double > showerAnglearray;
+  std::vector < double > showerPFParray;
+  std::vector < double > showerSlicearray;
 
-  for (size_t i = 0; i<hitvars.size()-kHitEnd; i+=kHitEnd) {
-   xarray.push_back(hitvars[i+x]);
-   yarray.push_back(hitvars[i+y]);
-   zarray.push_back(hitvars[i+z]);
-   pfparray.push_back(hitvars[i+kpfp]);
-   slicearray.push_back(hitvars[i+kslice]);
-   planeidarray.push_back(hitvars[i+kplaneid]);
+  for (size_t i = 0; i < hitvars.size() - kHitEnd; i += kHitEnd) {
+    xarray.push_back(hitvars[i + x]);
+    yarray.push_back(hitvars[i + y]);
+    zarray.push_back(hitvars[i + z]);
+    pfparray.push_back(hitvars[i + kpfp]);
+    slicearray.push_back(hitvars[i + kslice]);
+    planeidarray.push_back(hitvars[i + kplaneid]);
   }
 
-  for (size_t i = 0; i<crtvars.size()-kCRTEnd; i+=kCRTEnd) {
-   crtxarray.push_back(crtvars[i+crtx]);
-   crtyarray.push_back(crtvars[i+crty]);
-   crtzarray.push_back(crtvars[i+crtz]);
-   crttimearray.push_back(crtvars[i+crttime]);
-   crtplanearray.push_back(crtvars[i+crtplane]);
+  for (size_t i = 0; i < crtvars.size() - kCRTEnd; i += kCRTEnd) {
+    crtxarray.push_back(crtvars[i + crtx]);
+    crtyarray.push_back(crtvars[i + crty]);
+    crtzarray.push_back(crtvars[i + crtz]);
+    crttimearray.push_back(crtvars[i + crttime]);
+    crtplanearray.push_back(crtvars[i + crtplane]);
   }
 
-  for (size_t i = 0; i<opvars.size()-kFlashEnd; i+=kFlashEnd) {
-   flashxarray.push_back(opvars[i+flashx]);
-   flashyarray.push_back(opvars[i+flashy]);
-   flashzarray.push_back(opvars[i+flashz]);
-   flashtimearray.push_back(opvars[i+flashtime]);
-   flashwidthyarray.push_back(opvars[i+flashwidthy]);
-   flashwidthzarray.push_back(opvars[i+flashwidthz]);
+  for (size_t i = 0; i < opvars.size() - kFlashEnd; i += kFlashEnd) {
+    flashxarray.push_back(opvars[i + flashx]);
+    flashyarray.push_back(opvars[i + flashy]);
+    flashzarray.push_back(opvars[i + flashz]);
+    flashtimearray.push_back(opvars[i + flashtime]);
+    flashwidthyarray.push_back(opvars[i + flashwidthy]);
+    flashwidthzarray.push_back(opvars[i + flashwidthz]);
   }
 
-  for (size_t i = 0; i<trackvars.size()-kTrackEnd; i+=kTrackEnd) {
-   trackStartXarray.push_back(trackvars[i+trackstartx]);
-   trackStartYarray.push_back(trackvars[i+trackstarty]);
-   trackStartZarray.push_back(trackvars[i+trackstartz]);
-   trackEndXarray.push_back(trackvars[i+trackendx]);
-   trackEndYarray.push_back(trackvars[i+trackendy]);
-   trackEndZarray.push_back(trackvars[i+trackendz]);
-   trackPFParray.push_back(trackvars[i+trackpfp]);
-   trackSlicearray.push_back(trackvars[i+trackslice]);
+  for (size_t i = 0; i < trackvars.size() - kTrackEnd; i += kTrackEnd) {
+    trackStartXarray.push_back(trackvars[i + trackstartx]);
+    trackStartYarray.push_back(trackvars[i + trackstarty]);
+    trackStartZarray.push_back(trackvars[i + trackstartz]);
+    trackEndXarray.push_back(trackvars[i + trackendx]);
+    trackEndYarray.push_back(trackvars[i + trackendy]);
+    trackEndZarray.push_back(trackvars[i + trackendz]);
+    trackPFParray.push_back(trackvars[i + trackpfp]);
+    trackSlicearray.push_back(trackvars[i + trackslice]);
 
   }
 
-  for (size_t i = 0; i<showervars.size()-kShowerEnd; i+=kShowerEnd) {
-   showerStartXarray.push_back(showervars[i+showerstartx]);
-   showerStartYarray.push_back(showervars[i+showerstarty]);
-   showerStartZarray.push_back(showervars[i+showerstartz]);
-   showerDirXarray.push_back(showervars[i+showerdirx]);
-   showerDirYarray.push_back(showervars[i+showerdiry]);
-   showerDirZarray.push_back(showervars[i+showerdirz]);
-   showerLengtharray.push_back(showervars[i+showerlength]);
-   showerAnglearray.push_back(showervars[i+showerangle]);
-   showerPFParray.push_back(showervars[i+showerpfp]);
-   showerSlicearray.push_back(showervars[i+showerslice]);
+  for (size_t i = 0; i < showervars.size() - kShowerEnd; i += kShowerEnd) {
+    showerStartXarray.push_back(showervars[i + showerstartx]);
+    showerStartYarray.push_back(showervars[i + showerstarty]);
+    showerStartZarray.push_back(showervars[i + showerstartz]);
+    showerDirXarray.push_back(showervars[i + showerdirx]);
+    showerDirYarray.push_back(showervars[i + showerdiry]);
+    showerDirZarray.push_back(showervars[i + showerdirz]);
+    showerLengtharray.push_back(showervars[i + showerlength]);
+    showerAnglearray.push_back(showervars[i + showerangle]);
+    showerPFParray.push_back(showervars[i + showerpfp]);
+    showerSlicearray.push_back(showervars[i + showerslice]);
   }
 
   X.push_back(xarray);
@@ -189,63 +184,77 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   return 42;
 });
 
-void LoadReco()
-{
+void LoadReco() {
   if (event.empty()) {
     gMultiView->DestroyEventRPhi();
 
     gMultiView->DestroyEventRhoZ();
-    gEve->Redraw3D(kFALSE,kTRUE);
+    gEve->Redraw3D(kFALSE, kTRUE);
 
-   return;
+    return;
   }
 
-  auto top = gEve->GetCurrentEvent(); 
-  std::list<TEveElement*> children;
-  top->FindChildren(children,"Reco");
-  for (auto const& child : children) { if (child) { child->Destroy(); } }
+  auto top = gEve->GetCurrentEvent();
+  std::list < TEveElement *> children;
+  top->FindChildren(children, "Reco");
+  for (auto
+    const & child: children) {
+    if (child) {
+      child->Destroy();
+    }
+  }
 
   int c = 0;
 
-  for (size_t e = 0; e<TrackStartX[spill].size(); e++) {
-   if (c == 10 || c == 19) { c++; }
+  for (size_t e = 0; e < TrackStartX[spill].size(); e++) {
+    if (c == 10 || c == 19) {
+      c++;
+    }
 
-   auto line = new TEveLine;
-   line->SetNextPoint(TrackStartX[spill][e],TrackStartY[spill][e],TrackStartZ[spill][e]);
-   line->SetNextPoint(TrackEndX[spill][e],TrackEndY[spill][e],TrackEndZ[spill][e]);
-   if (ColorBySlice) {line->SetMainColor(TrackSlice[spill][e]);}
-   else if (ColorByPFPs) {line->SetMainColor(abs(TrackPFP[spill][e]));}
-   line->SetMainTransparency(25);
-   line->SetLineWidth(5);
-   line->SetElementName("Reco");
+    auto line = new TEveLine;
+    line->SetNextPoint(TrackStartX[spill][e], TrackStartY[spill][e], TrackStartZ[spill][e]);
+    line->SetNextPoint(TrackEndX[spill][e], TrackEndY[spill][e], TrackEndZ[spill][e]);
+    if (ColorBySlice) {
+      line->SetMainColor(TrackSlice[spill][e]);
+    } else if (ColorByPFPs) {
+      line->SetMainColor(abs(TrackPFP[spill][e]));
+    }
+    line->SetMainTransparency(25);
+    line->SetLineWidth(5);
+    line->SetElementName("Reco");
 
-   gEve->AddElement(line);
-   top = gEve->GetCurrentEvent();
+    gEve->AddElement(line);
+    top = gEve->GetCurrentEvent();
 
-   gMultiView->DestroyEventRPhi();
-   gMultiView->ImportEventRPhi(top);
+    gMultiView->DestroyEventRPhi();
+    gMultiView->ImportEventRPhi(top);
 
-   gMultiView->DestroyEventRhoZ();
-   gMultiView->ImportEventRhoZ(top);
-   gEve->Redraw3D(kFALSE,kTRUE);
-   c++;
+    gMultiView->DestroyEventRhoZ();
+    gMultiView->ImportEventRhoZ(top);
+    gEve->Redraw3D(kFALSE, kTRUE);
+    c++;
   }
 
-  TEveBoxSet* showers = new TEveBoxSet;
+  TEveBoxSet *showers = new TEveBoxSet;
   showers->Reset(TEveBoxSet::kBT_Cone, kFALSE, 64);
   TEveVector pos, dir;
-  for (size_t e = 0; e<ShowerStartX[spill].size(); e++) {
-    if (c == 10 || c == 19) { c++; }
+  for (size_t e = 0; e < ShowerStartX[spill].size(); e++) {
+    if (c == 10 || c == 19) {
+      c++;
+    }
 
-    pos.Set(ShowerStartX[spill][e],ShowerStartY[spill][e],ShowerStartZ[spill][e]);
-    dir.Set(ShowerDirX[spill][e],ShowerDirY[spill][e],ShowerDirZ[spill][e]);
-    dir*=ShowerLength[spill][e];
-    double radius = TMath::Tan(ShowerAngle[spill][e])*ShowerLength[spill][e];
+    pos.Set(ShowerStartX[spill][e], ShowerStartY[spill][e], ShowerStartZ[spill][e]);
+    dir.Set(ShowerDirX[spill][e], ShowerDirY[spill][e], ShowerDirZ[spill][e]);
+    dir *= ShowerLength[spill][e];
+    double radius = TMath::Tan(ShowerAngle[spill][e]) *ShowerLength[spill][e];
 
     showers->AddCone(pos, dir, radius);
     showers->DigitValue(ShowerPFP[spill][e]);
-    if (ColorBySlice) { showers->DigitColor(ShowerSlice[spill][e],25);}
-    else if (ColorByPFPs) {showers->DigitColor(abs(ShowerPFP[spill][e]),25);}
+    if (ColorBySlice) {
+      showers->DigitColor(ShowerSlice[spill][e], 25);
+    } else if (ColorByPFPs) {
+      showers->DigitColor(abs(ShowerPFP[spill][e]), 25);
+    }
   }
   showers->SetElementName("Reco");
   showers->RefitPlex();
@@ -257,365 +266,435 @@ void LoadReco()
 
   gMultiView->DestroyEventRhoZ();
   gMultiView->ImportEventRhoZ(top);
-  gEve->Redraw3D(kFALSE,kTRUE);
+  gEve->Redraw3D(kFALSE, kTRUE);
 }
 
-void LoadFlashes(float min, float max)
-{
+void LoadFlashes(float min, float max) {
   if (event.empty()) {
     gMultiView->DestroyEventRPhi();
 
     gMultiView->DestroyEventRhoZ();
-    gEve->Redraw3D(kFALSE,kTRUE);
+    gEve->Redraw3D(kFALSE, kTRUE);
 
-   return;
+    return;
   }
 
-  auto top = gEve->GetCurrentEvent(); 
-  std::list<TEveElement*> children;
-  top->FindChildren(children,"Op Flashes");
-  for (auto const& child : children) { if (child) { child->Destroy(); } }
+  auto top = gEve->GetCurrentEvent();
+  std::list < TEveElement *> children;
+  top->FindChildren(children, "Op Flashes");
+  for (auto
+    const & child: children) {
+    if (child) {
+      child->Destroy();
+    }
+  }
 
   int c = 0;
 
-  for (size_t e = 0; e<FlashTime[spill].size(); e++) {
-   if (FlashTime[spill][e] < min || FlashTime[spill][e] > max) { continue; }
-   if (c == 10 || c == 19) { c++; }
+  for (size_t e = 0; e < FlashTime[spill].size(); e++) {
+    if (FlashTime[spill][e] < min || FlashTime[spill][e] > max) {
+      continue;
+    }
+    if (c == 10 || c == 19) {
+      c++;
+    }
 
+    Float_t x = FlashX[spill][e], y = FlashY[spill][e], z = FlashZ[spill][e];
+    Float_t y_width = FlashWidthY[spill][e], z_width = FlashWidthZ[spill][e];
 
-   Float_t x = FlashX[spill][e], y = FlashY[spill][e], z = FlashZ[spill][e];
-   Float_t y_width = FlashWidthY[spill][e], z_width = FlashWidthZ[spill][e];
+    if (abs(x) == 0) {
+      continue;
+    }
+    if (abs(y_width) <= 2 || abs(y_width) >= 680 || abs(z_width) <= 2 || abs(z_width) >= 680) {
+      continue;
+    }
+    if (isnan(y) || isnan(z)) {
+      continue;
+    }
+    if (isnan(y_width) || isnan(z_width)) {
+      continue;
+    }
+    if (isinf(y) || isinf(z)) {
+      continue;
+    }
+    if (isinf(y_width) || isinf(z_width)) {
+      continue;
+    }
 
-   if (abs(x) == 0) {continue;}
-   if (abs(y_width) <= 2 || abs(y_width) >= 680 || abs(z_width) <= 2 || abs(z_width) >= 680 ) {continue;}
-   if (isnan(y) || isnan(z)) {continue;}
-   if (isnan(y_width) || isnan(z_width)) {continue;}
-   if (isinf(y) || isinf(z)) {continue;}
-   if (isinf(y_width) || isinf(z_width)) {continue;}
+    auto box = new TEveBox;
+    box->SetMainColor(c);
+    box->SetMainTransparency(50);
 
-   auto box = new TEveBox;
-   box->SetMainColor(c);
-   box->SetMainTransparency(50);
+    box->SetVertex(0, x - 1, y - y_width / 2, z - z_width / 2);
+    box->SetVertex(1, x - 1, y + y_width / 2, z - z_width / 2);
+    box->SetVertex(2, x + 1, y + y_width / 2, z - z_width / 2);
+    box->SetVertex(3, x + 1, y - y_width / 2, z - z_width / 2);
+    box->SetVertex(4, x - 1, y - y_width / 2, z + z_width / 2);
+    box->SetVertex(5, x - 1, y + y_width / 2, z + z_width / 2);
+    box->SetVertex(6, x + 1, y + y_width / 2, z + z_width / 2);
+    box->SetVertex(7, x + 1, y - y_width / 2, z + z_width / 2);
 
-   box->SetVertex(0, x-1, y - y_width/2, z - z_width/2);
-   box->SetVertex(1, x-1, y + y_width/2, z - z_width/2);
-   box->SetVertex(2, x+1, y + y_width/2, z - z_width/2);
-   box->SetVertex(3, x+1, y - y_width/2, z - z_width/2);
-   box->SetVertex(4, x-1, y - y_width/2, z + z_width/2);
-   box->SetVertex(5, x-1, y + y_width/2, z + z_width/2);
-   box->SetVertex(6, x+1, y + y_width/2, z + z_width/2);
-   box->SetVertex(7, x+1, y - y_width/2, z + z_width/2);
+    box->SetElementName("Op Flashes");
+    gEve->AddElement(box);
+    auto top = gEve->GetCurrentEvent();
 
-   box->SetElementName("Op Flashes");
-   gEve->AddElement(box);
-   auto top = gEve->GetCurrentEvent();
+    gMultiView->DestroyEventRPhi();
+    gMultiView->ImportEventRPhi(top);
 
-   gMultiView->DestroyEventRPhi();
-   gMultiView->ImportEventRPhi(top);
-
-   gMultiView->DestroyEventRhoZ();
-   gMultiView->ImportEventRhoZ(top);
-   gEve->Redraw3D(kFALSE,kTRUE);
-   c++;
+    gMultiView->DestroyEventRhoZ();
+    gMultiView->ImportEventRhoZ(top);
+    gEve->Redraw3D(kFALSE, kTRUE);
+    c++;
   }
 }
 
-void LoadCRTHits(float min, float max)
-{
+void LoadCRTHits(float min, float max) {
   if (event.empty()) {
     gMultiView->DestroyEventRPhi();
 
     gMultiView->DestroyEventRhoZ();
-    gEve->Redraw3D(kFALSE,kTRUE);
+    gEve->Redraw3D(kFALSE, kTRUE);
 
-   return;
+    return;
   }
 
-  auto top = gEve->GetCurrentEvent(); 
+  auto top = gEve->GetCurrentEvent();
   auto child = top->FindChild("CRT Hits");
-  if (child) { child->Destroy(); }
+  if (child) {
+    child->Destroy();
+  }
 
   auto marker = new TEvePointSet();
   marker->SetOwnIds(kTRUE);
 
-  for (size_t e = 0; e<CRTX[spill].size(); e++) {
-   if (CRTTime[spill][e] < min || CRTTime[spill][e] > max) { continue; }
+  for (size_t e = 0; e < CRTX[spill].size(); e++) {
+    if (CRTTime[spill][e] < min || CRTTime[spill][e] > max) {
+      continue;
+    }
 
-   marker->SetNextPoint(CRTX[spill][e],CRTY[spill][e],CRTZ[spill][e]);
-   marker->SetPointId(new TNamed(Form("CRT Point %d", int(e)), ""));
+    marker->SetNextPoint(CRTX[spill][e], CRTY[spill][e], CRTZ[spill][e]);
+    marker->SetPointId(new TNamed(Form("CRT Point %d", int(e)), ""));
   }
   marker->SetElementName("CRT Hits");
   marker->SetMarkerSize(.4);
   marker->SetMarkerStyle(8);
   marker->SetMainColor(1);
   gEve->AddElement(marker);
-  top = gEve->GetCurrentEvent(); 
+  top = gEve->GetCurrentEvent();
 
   gMultiView->DestroyEventRPhi();
   gMultiView->ImportEventRPhi(top);
 
   gMultiView->DestroyEventRhoZ();
   gMultiView->ImportEventRhoZ(top);
-  gEve->Redraw3D(kFALSE,kTRUE);
+  gEve->Redraw3D(kFALSE, kTRUE);
 }
 
-void LoadTPCHits()
-{
+void LoadTPCHits() {
   if (event.empty()) {
     gMultiView->DestroyEventRPhi();
 
     gMultiView->DestroyEventRhoZ();
-    gEve->Redraw3D(kFALSE,kTRUE);
+    gEve->Redraw3D(kFALSE, kTRUE);
 
-   return;
+    return;
   }
 
-
-  std::vector<double> color_ids;
-  std::vector<double> unique_indices;
-  std::vector<double>::iterator it;
+  std::vector < double > color_ids;
+  std::vector < double > unique_indices;
+  std::vector < double > ::iterator it;
 
   if (ColorBySlice) {
-   color_ids = SliceID[spill];
-   unique_indices = SliceID[spill];
-   std::sort(unique_indices.begin(),unique_indices.end());
-   it = std::unique(unique_indices.begin(),unique_indices.end());
-   unique_indices.resize(std::distance(unique_indices.begin(),it));
-  }
-  else if (ColorByPFPs) {
-   color_ids = PFPID[spill];
-   unique_indices = PFPID[spill];
-   std::sort(unique_indices.begin(),unique_indices.end());
-   it = std::unique(unique_indices.begin(),unique_indices.end());
-   unique_indices.resize(std::distance(unique_indices.begin(),it));
+    color_ids = SliceID[spill];
+    unique_indices = SliceID[spill];
+    std::sort(unique_indices.begin(), unique_indices.end());
+    it = std::unique(unique_indices.begin(), unique_indices.end());
+    unique_indices.resize(std::distance(unique_indices.begin(), it));
+  } else if (ColorByPFPs) {
+    color_ids = PFPID[spill];
+    unique_indices = PFPID[spill];
+    std::sort(unique_indices.begin(), unique_indices.end());
+    it = std::unique(unique_indices.begin(), unique_indices.end());
+    unique_indices.resize(std::distance(unique_indices.begin(), it));
   }
 
   int c = 0;
 
-  for (int ID : unique_indices) {
-   if (c == 10 || c == 19) { c++; }
+  for (int ID: unique_indices) {
+    if (c == 10 || c == 19) {
+      c++;
+    }
 
-   auto marker = new TEvePointSet();
-   marker->SetOwnIds(kTRUE);
+    auto marker = new TEvePointSet();
+    marker->SetOwnIds(kTRUE);
 
-   int target = ID; 
-   std::vector<int> indices = findItems(color_ids, target);
-   int cryo;
-   for (auto &e: indices) {
+    int target = ID;
+    std::vector < int > indices = findItems(color_ids, target);
+    int cryo;
+    for (auto & e: indices) {
 
-    if (color_ids[e] != ID) { continue; } 
+      if (color_ids[e] != ID) {
+        continue;
+      }
 
-    if (!DrawPlane1 && PlaneID[spill][e] == 0) { continue; } 
-    if (!DrawPlane2 && PlaneID[spill][e] == 1) { continue; } 
-    if (!DrawPlane3 && PlaneID[spill][e] == 2) { continue; } 
+      if (!DrawPlane1 && PlaneID[spill][e] == 0) {
+        continue;
+      }
+      if (!DrawPlane2 && PlaneID[spill][e] == 1) {
+        continue;
+      }
+      if (!DrawPlane3 && PlaneID[spill][e] == 2) {
+        continue;
+      }
 
-    marker->SetNextPoint(X[spill][e],Y[spill][e],Z[spill][e]);
+      marker->SetNextPoint(X[spill][e], Y[spill][e], Z[spill][e]);
 
-    if (X[spill][e] > 0) { cryo=1; }
-    else { cryo=0; }
-    marker->SetPointId(new TNamed(Form("Point %d CRYO %d", e, cryo), ""));
+      if (X[spill][e] > 0) {
+        cryo = 1;
+      } else {
+        cryo = 0;
+      }
+      marker->SetPointId(new TNamed(Form("Point %d CRYO %d", e, cryo), ""));
 
-   }
+    }
 
-   marker->SetMarkerSize(.4);
-   marker->SetMarkerStyle(8);
-   marker->SetMainColor(1+c);
-   marker->SetElementName("TPC Hits");
-   gEve->AddElement(marker);
-   auto top = gEve->GetCurrentEvent();
+    marker->SetMarkerSize(.4);
+    marker->SetMarkerStyle(8);
+    marker->SetMainColor(1 + c);
+    marker->SetElementName("TPC Hits");
+    gEve->AddElement(marker);
+    auto top = gEve->GetCurrentEvent();
 
-   gMultiView->DestroyEventRPhi();
-   gMultiView->ImportEventRPhi(top);
+    gMultiView->DestroyEventRPhi();
+    gMultiView->ImportEventRPhi(top);
 
-   gMultiView->DestroyEventRhoZ();
-   gMultiView->ImportEventRhoZ(top);
-   gEve->Redraw3D(kFALSE,kTRUE);
-   c++;
+    gMultiView->DestroyEventRhoZ();
+    gMultiView->ImportEventRhoZ(top);
+    gEve->Redraw3D(kFALSE, kTRUE);
+    c++;
   }
 }
 
-void doAdvanceSpill(float min, float max)
-{
+void doAdvanceSpill(float min, float max) {
   if (spill < nSpills - 1) {
-   spill++;
-   gEve->GetCurrentEvent()->DestroyElements();
-   LoadTPCHits();
-   if (PlotCRTHits) { 
-     LoadCRTHits(min, max); 
-   }
-   if (PlotFlashes) { 
-     LoadFlashes(min, max); 
-   }
-   if (PlotReco) {
-     LoadReco();
-   }
-   runstring = run[spill];
-   eventstring = event[spill];
+    spill++;
+    gEve->GetCurrentEvent()->DestroyElements();
+    LoadTPCHits();
+    if (PlotCRTHits) {
+      LoadCRTHits(min, max);
+    }
+    if (PlotFlashes) {
+      LoadFlashes(min, max);
+    }
+    if (PlotReco) {
+      LoadReco();
+    }
+    runstring = run[spill];
+    eventstring = event[spill];
   }
 }
-void doPreviousSpill(float min, float max)
-{
+void doPreviousSpill(float min, float max) {
   if (spill > 0) {
-   spill--;
-   gEve->GetCurrentEvent()->DestroyElements();
-   LoadTPCHits();
-   if (PlotCRTHits) { 
-     LoadCRTHits(min, max); 
-   }
-   if (PlotFlashes) { 
-     LoadFlashes(min, max); 
-   }
-   if (PlotReco) {
-     LoadReco();
-   }
-   runstring = run[spill];
-   eventstring = event[spill];
+    spill--;
+    gEve->GetCurrentEvent()->DestroyElements();
+    LoadTPCHits();
+    if (PlotCRTHits) {
+      LoadCRTHits(min, max);
+    }
+    if (PlotFlashes) {
+      LoadFlashes(min, max);
+    }
+    if (PlotReco) {
+      LoadReco();
+    }
+    runstring = run[spill];
+    eventstring = event[spill];
   }
 }
-void doColorbySlice()
-{
+void doColorbySlice() {
   ColorByPFPs = false;
-  ColorBySlice = true;  
-  auto top = gEve->GetCurrentEvent(); 
-  std::list<TEveElement*> children;
-  top->FindChildren(children,"TPC Hits");
-  for (auto const& child : children) { if (child) { child->Destroy(); } }
+  ColorBySlice = true;
+  auto top = gEve->GetCurrentEvent();
+  std::list < TEveElement *> children;
+  top->FindChildren(children, "TPC Hits");
+  for (auto
+    const & child: children) {
+    if (child) {
+      child->Destroy();
+    }
+  }
   LoadTPCHits();
-   if (PlotReco) {
-     LoadReco();
-   }
+  if (PlotReco) {
+    LoadReco();
+  }
 }
-void doColorbyPFP()
-{
+void doColorbyPFP() {
   ColorByPFPs = true;
-  ColorBySlice = false;  
-  auto top = gEve->GetCurrentEvent(); 
-  std::list<TEveElement*> children;
-  top->FindChildren(children,"TPC Hits");
-  for (auto const& child : children) { if (child) { child->Destroy(); } }
+  ColorBySlice = false;
+  auto top = gEve->GetCurrentEvent();
+  std::list < TEveElement *> children;
+  top->FindChildren(children, "TPC Hits");
+  for (auto
+    const & child: children) {
+    if (child) {
+      child->Destroy();
+    }
+  }
   LoadTPCHits();
-   if (PlotReco) {
-     LoadReco();
-   }
+  if (PlotReco) {
+    LoadReco();
+  }
 }
-void doDrawCRTHits(bool pressed, float min, float max)
-{
+void doDrawCRTHits(bool pressed, float min, float max) {
   PlotCRTHits = pressed;
-  auto top = gEve->GetCurrentEvent(); 
-  if (PlotCRTHits) { 
-   LoadCRTHits(min, max); 
-  }
-  else {
-   auto top = gEve->GetCurrentEvent(); 
-   auto child = top->FindChild("CRT Hits");
-   if (child) { child->Destroy(); }
+  auto top = gEve->GetCurrentEvent();
+  if (PlotCRTHits) {
+    LoadCRTHits(min, max);
+  } else {
+    auto top = gEve->GetCurrentEvent();
+    auto child = top->FindChild("CRT Hits");
+    if (child) {
+      child->Destroy();
+    }
   }
 }
-void doDrawFlashes(bool pressed, float min, float max)
-{
+void doDrawFlashes(bool pressed, float min, float max) {
   PlotFlashes = pressed;
-  auto top = gEve->GetCurrentEvent(); 
-  if (PlotFlashes) { 
-   LoadFlashes(min, max); 
-  }
-  else {
-   auto top = gEve->GetCurrentEvent(); 
-   std::list<TEveElement*> children;
-   top->FindChildren(children,"Op Flashes");
-   for (auto const& child : children) { if (child) { child->Destroy(); } }
+  auto top = gEve->GetCurrentEvent();
+  if (PlotFlashes) {
+    LoadFlashes(min, max);
+  } else {
+    auto top = gEve->GetCurrentEvent();
+    std::list < TEveElement *> children;
+    top->FindChildren(children, "Op Flashes");
+    for (auto
+      const & child: children) {
+      if (child) {
+        child->Destroy();
+      }
+    }
   }
 }
-void doDrawReco(bool pressed)
-{
-  auto top = gEve->GetCurrentEvent(); 
+void doDrawReco(bool pressed) {
+  auto top = gEve->GetCurrentEvent();
   if (pressed) {
-   PlotReco = true;
-   LoadReco(); 
-  }
-  else {
-   PlotReco = false;
-   auto top = gEve->GetCurrentEvent(); 
-   std::list<TEveElement*> children;
-   top->FindChildren(children,"Reco");
-   for (auto const& child : children) { if (child) { child->Destroy(); } }
+    PlotReco = true;
+    LoadReco();
+  } else {
+    PlotReco = false;
+    auto top = gEve->GetCurrentEvent();
+    std::list < TEveElement *> children;
+    top->FindChildren(children, "Reco");
+    for (auto
+      const & child: children) {
+      if (child) {
+        child->Destroy();
+      }
+    }
   }
 }
-void doUseSliceCuts(std::vector<int> cut_indices)
-{
+void doUseSliceCuts(std::vector < int > cut_indices) {
   useSliceCuts = true;
   sliceCutIndices = cut_indices;
   GetSpectrumSelection();
-  auto top = gEve->GetCurrentEvent(); 
-  std::list<TEveElement*> children;
-  top->FindChildren(children,"TPC Hits");
-   for (auto const& child : children) { if (child) { child->Destroy(); } }
+  auto top = gEve->GetCurrentEvent();
+  std::list < TEveElement *> children;
+  top->FindChildren(children, "TPC Hits");
+  for (auto
+    const & child: children) {
+    if (child) {
+      child->Destroy();
+    }
+  }
   LoadTPCHits();
-   if (PlotReco) {
-     LoadReco();
-   }
+  if (PlotReco) {
+    LoadReco();
+  }
 }
-void doUseSpillCuts(std::vector<int> cut_indices)
-{
+void doUseSpillCuts(std::vector < int > cut_indices) {
   useSpillCuts = true;
   spillCutIndices = cut_indices;
   GetSpectrumSelection();
-  auto top = gEve->GetCurrentEvent(); 
-  std::list<TEveElement*> children;
-  top->FindChildren(children,"TPC Hits");
-   for (auto const& child : children) { if (child) { child->Destroy(); } }
+  auto top = gEve->GetCurrentEvent();
+  std::list < TEveElement *> children;
+  top->FindChildren(children, "TPC Hits");
+  for (auto
+    const & child: children) {
+    if (child) {
+      child->Destroy();
+    }
+  }
   LoadTPCHits();
-   if (PlotReco) {
-     LoadReco();
-   }
+  if (PlotReco) {
+    LoadReco();
+  }
 }
-void doUseNuSlice(bool pressed)
-{
+void doUseNuSlice(bool pressed) {
   onlyNuSlice = pressed;
   GetSpectrumSelection();
-  auto top = gEve->GetCurrentEvent(); 
-  std::list<TEveElement*> children;
-  top->FindChildren(children,"TPC Hits");
-   for (auto const& child : children) { if (child) { child->Destroy(); } }
+  auto top = gEve->GetCurrentEvent();
+  std::list < TEveElement *> children;
+  top->FindChildren(children, "TPC Hits");
+  for (auto
+    const & child: children) {
+    if (child) {
+      child->Destroy();
+    }
+  }
   LoadTPCHits();
-   if (PlotReco) {
-     LoadReco();
-   }
+  if (PlotReco) {
+    LoadReco();
+  }
 }
-void doDrawPlane1(bool pressed)
-{
+void doDrawPlane1(bool pressed) {
   DrawPlane1 = pressed;
-  auto top = gEve->GetCurrentEvent(); 
-  std::list<TEveElement*> children;
-  top->FindChildren(children,"TPC Hits");
-   for (auto const& child : children) { if (child) { child->Destroy(); } }
+  auto top = gEve->GetCurrentEvent();
+  std::list < TEveElement *> children;
+  top->FindChildren(children, "TPC Hits");
+  for (auto
+    const & child: children) {
+    if (child) {
+      child->Destroy();
+    }
+  }
   LoadTPCHits();
 }
-void doDrawPlane2(bool pressed)
-{
+void doDrawPlane2(bool pressed) {
   DrawPlane2 = pressed;
-  auto top = gEve->GetCurrentEvent(); 
-  std::list<TEveElement*> children;
-  top->FindChildren(children,"TPC Hits");
-   for (auto const& child : children) { if (child) { child->Destroy(); } }
+  auto top = gEve->GetCurrentEvent();
+  std::list < TEveElement *> children;
+  top->FindChildren(children, "TPC Hits");
+  for (auto
+    const & child: children) {
+    if (child) {
+      child->Destroy();
+    }
+  }
   LoadTPCHits();
 }
-void doDrawPlane3(bool pressed)
-{
+void doDrawPlane3(bool pressed) {
   DrawPlane3 = pressed;
-  auto top = gEve->GetCurrentEvent(); 
-  std::list<TEveElement*> children;
-  top->FindChildren(children,"TPC Hits");
-   for (auto const& child : children) { if (child) { child->Destroy(); } }
+  auto top = gEve->GetCurrentEvent();
+  std::list < TEveElement *> children;
+  top->FindChildren(children, "TPC Hits");
+  for (auto
+    const & child: children) {
+    if (child) {
+      child->Destroy();
+    }
+  }
   LoadTPCHits();
 }
-void doTimeSel(float min, float max)
-{
-  if (PlotCRTHits) { LoadCRTHits(min, max); }
-  if (PlotFlashes) { LoadFlashes(min, max); }
+void doTimeSel(float min, float max) {
+  if (PlotCRTHits) {
+    LoadCRTHits(min, max);
+  }
+  if (PlotFlashes) {
+    LoadFlashes(min, max);
+  }
 }
 
-void GetSpectrumSelection()
-{
+void GetSpectrumSelection() {
   X.clear();
   Y.clear();
   Z.clear();
@@ -665,18 +744,17 @@ void GetSpectrumSelection()
 
   SpillCut thisCut = kNoSpillCut;
   if (useSpillCuts) {
-   for (auto cut : spillCutIndices) { 
+    for (auto cut: spillCutIndices) {
       thisCut = thisCut && spill_cuts[cut];
-   }
+    }
   }
 
-  Spectrum sFindSpill("",bins,loader,kFindEvents,thisCut,kSpillUnweighted);
+  Spectrum sFindSpill("", bins, loader, kFindEvents, thisCut, kSpillUnweighted);
 
   loader.Go();
 }
 
-void event_display(const std::string inputName)
-{
+void event_display_test(const std::string inputName) {
   fname = inputName;
   gSystem->Load("libGeom");
   ///// Uncomment if you need to recreate the geometry file
@@ -726,8 +804,8 @@ void event_display(const std::string inputName)
   Phy_Building->AddNodeOverlap(TPC,3,new TGeoTranslation( cryoPosX-tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
   Phy_Building->AddNodeOverlap(TPC,4,new TGeoTranslation( cryoPosX+tpcPosX, cryoPosZ-tpcPosZ, cryoPosY-tpcPosY));
 
-     // Top CRTs 
-   TGeoVolume *CRT_30 = geom->MakeBox("CRT_30", Iron, 550, 2, 1280); 
+     // Top CRTs
+   TGeoVolume *CRT_30 = geom->MakeBox("CRT_30", Iron, 550, 2, 1280);
    CRT_30->SetLineColor(18);
    CRT_30->SetLineWidth(2);
    CRT_30->SetTransparency(90);
@@ -747,55 +825,55 @@ void event_display(const std::string inputName)
    CRT_34->SetLineColor(18);
    CRT_34->SetLineWidth(2);
    CRT_34->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(CRT_34, 1, new TGeoTranslation(.5, 525, 1533)); // rim north, 34  
+   Phy_Building->AddNodeOverlap(CRT_34, 1, new TGeoTranslation(.5, 525, 1533)); // rim north, 34
    // Side West
    TGeoVolume *CRT_40_42 = geom->MakeBox("CRT_40_42", Iron, 4.135, 375, 400);
    CRT_40_42->SetLineColor(18);
    CRT_40_42->SetLineWidth(2);
    CRT_40_42->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(CRT_40_42, 1, new TGeoTranslation(530.355, 75, -773.34)); // side west-south, 40    
-   Phy_Building->AddNodeOverlap(CRT_40_42, 2, new TGeoTranslation(530.355, 75, 759.34)); // side west-north, 42 
+   Phy_Building->AddNodeOverlap(CRT_40_42, 1, new TGeoTranslation(530.355, 75, -773.34)); // side west-south, 40
+   Phy_Building->AddNodeOverlap(CRT_40_42, 2, new TGeoTranslation(530.355, 75, 759.34)); // side west-north, 42
    TGeoVolume *CRT_41 = geom->MakeBox("CRT_41", Iron, 4.135, 335, 400);
    CRT_41->SetLineColor(18);
    CRT_41->SetLineWidth(2);
    CRT_41->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(CRT_41, 1, new TGeoTranslation(560.19, 55, -7)); // side west-center, 41    
+   Phy_Building->AddNodeOverlap(CRT_41, 1, new TGeoTranslation(560.19, 55, -7)); // side west-center, 41
    //Side East
    TGeoVolume *CRT_43 = geom->MakeBox("CRT_43", Iron, 4.135, 340, 400);
    CRT_43->SetLineColor(18);
    CRT_43->SetLineWidth(2);
    CRT_43->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(CRT_43, 1, new TGeoTranslation(-530.355, 80, -773.34)); // side east-south, 43 
+   Phy_Building->AddNodeOverlap(CRT_43, 1, new TGeoTranslation(-530.355, 80, -773.34)); // side east-south, 43
    TGeoVolume *CRT_44 = geom->MakeBox("CRT_44", Iron, 4.135, 310, 400);
    CRT_44->SetLineColor(18);
    CRT_44->SetLineWidth(2);
    CRT_44->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(CRT_44, 1, new TGeoTranslation(-560.19, 90, -7)); // side east-center, 44    
+   Phy_Building->AddNodeOverlap(CRT_44, 1, new TGeoTranslation(-560.19, 90, -7)); // side east-center, 44
    TGeoVolume *CRT_45 = geom->MakeBox("CRT_45", Iron, 4.135, 365, 400);
    CRT_45->SetLineColor(18);
    CRT_45->SetLineWidth(2);
    CRT_45->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(CRT_45, 1, new TGeoTranslation(-530.355, 85, 759.34)); // side east-north, 45 
+   Phy_Building->AddNodeOverlap(CRT_45, 1, new TGeoTranslation(-530.355, 85, 759.34)); // side east-north, 45
    // Side South
    TGeoVolume *CRT_46 = geom->MakeBox("CRT_46", Iron, 500, 400, 7.205);
    CRT_46->SetLineColor(18);
    CRT_46->SetLineWidth(2);
    CRT_46->SetTransparency(90);
    Phy_Building->AddNodeOverlap(CRT_46, 1, new TGeoTranslation(0, 100, -1127.535)); // side south, 46
-   
-   //Side North wall is complicated - split up into 3 sections (top, mid(E+W)), bottom(E+W)) 
+
+   //Side North wall is complicated - split up into 3 sections (top, mid(E+W)), bottom(E+W))
    TGeoVolume *CRT_47_t = geom->MakeBox("CRT_47_t", Iron, 508.275, 120, 4.135); // Side North wall - top section
    CRT_47_t->SetLineColor(18);
    CRT_47_t->SetLineWidth(2);
    CRT_47_t->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(CRT_47_t, 1, new TGeoTranslation(0, 200, 1173.855)); // side north, 47 
+   Phy_Building->AddNodeOverlap(CRT_47_t, 1, new TGeoTranslation(0, 200, 1173.855)); // side north, 47
    TGeoVolume *CRT_47_m = geom->MakeBox("CRT_47_m", Iron, 77.475, 80, 4.135); // Side North wall - mid section
    CRT_47_m->SetLineColor(18);
    CRT_47_m->SetLineWidth(2);
    CRT_47_m->SetTransparency(90);
-   Phy_Building->AddNodeOverlap(CRT_47_m, 1, new TGeoTranslation(-430.8, 0, 1173.855)); // side north, 47 - mid East  
+   Phy_Building->AddNodeOverlap(CRT_47_m, 1, new TGeoTranslation(-430.8, 0, 1173.855)); // side north, 47 - mid East
    Phy_Building->AddNodeOverlap(CRT_47_m, 2, new TGeoTranslation(430.8, 0, 1173.855)); // side north, 47 - mid West
-   TGeoVolume *CRT_47_b = geom->MakeBox("CRT_47_m", Iron, 64.135, 40, 4.135); // Side North wall - bottom section 
+   TGeoVolume *CRT_47_b = geom->MakeBox("CRT_47_m", Iron, 64.135, 40, 4.135); // Side North wall - bottom section
    CRT_47_b->SetLineColor(18);
    CRT_47_b->SetLineWidth(2);
    CRT_47_b->SetTransparency(90);
@@ -860,7 +938,7 @@ void event_display(const std::string inputName)
   person->AddNode(foot, 1, new TGeoCombiTrans(10, -8, -90, rot3));
   person->AddNode(foot, 2, new TGeoCombiTrans(-10, -8, -90, rot3));
   TGeoRotation* rot4 = new TGeoRotation("rot4", 0, 270, 0);
-  Phy_Building->AddNode(person, 0, new TGeoCombiTrans(-700, -160, 0, rot4)); // side north, 47 - mid East  
+  Phy_Building->AddNode(person, 0, new TGeoCombiTrans(-700, -160, 0, rot4)); // side north, 47 - mid East
 
   TEveManager::Create();
   TGeoNode* node = gGeoManager->GetTopNode();
@@ -877,10 +955,10 @@ void event_display(const std::string inputName)
   TEveManager::Create();
 
   TEveGeoShape *gentle_geom = 0;
-  
+
   auto file = TFile::Open("guitools/simple_ICARUS_geom.root");
   if (!file) return;
-  auto gse = (TEveGeoShapeExtract*) file->Get("Gentle");
+  auto gse = (TEveGeoShapeExtract *) file->Get("Gentle");
   gentle_geom = TEveGeoShape::ImportShapeExtract(gse, 0);
   file->Close();
   gEve->AddGlobalElement(gentle_geom);
