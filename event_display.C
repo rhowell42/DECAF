@@ -45,45 +45,45 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
     return 42;
   }
 
-  std::vector < double > xarray;
-  std::vector < double > yarray;
-  std::vector < double > zarray;
-  std::vector < double > pfparray;
-  std::vector < double > slicearray;
-  std::vector < double > planeidarray;
+  std::vector<double>xarray;
+  std::vector<double>yarray;
+  std::vector<double>zarray;
+  std::vector<double>pfparray;
+  std::vector<double>slicearray;
+  std::vector<double>planeidarray;
 
-  std::vector < double > crtxarray;
-  std::vector < double > crtyarray;
-  std::vector < double > crtzarray;
-  std::vector < double > crttimearray;
-  std::vector < double > crtplanearray;
+  std::vector<double>crtxarray;
+  std::vector<double>crtyarray;
+  std::vector<double>crtzarray;
+  std::vector<double>crttimearray;
+  std::vector<double>crtplanearray;
 
-  std::vector < double > flashxarray;
-  std::vector < double > flashyarray;
-  std::vector < double > flashzarray;
-  std::vector < double > flashwidthyarray;
-  std::vector < double > flashwidthzarray;
-  std::vector < double > flashtimearray;
+  std::vector<double>flashxarray;
+  std::vector<double>flashyarray;
+  std::vector<double>flashzarray;
+  std::vector<double>flashwidthyarray;
+  std::vector<double>flashwidthzarray;
+  std::vector<double>flashtimearray;
 
-  std::vector < double > trackStartXarray;
-  std::vector < double > trackStartYarray;
-  std::vector < double > trackStartZarray;
-  std::vector < double > trackEndXarray;
-  std::vector < double > trackEndYarray;
-  std::vector < double > trackEndZarray;
-  std::vector < double > trackPFParray;
-  std::vector < double > trackSlicearray;
+  std::vector<double>trackStartXarray;
+  std::vector<double>trackStartYarray;
+  std::vector<double>trackStartZarray;
+  std::vector<double>trackEndXarray;
+  std::vector<double>trackEndYarray;
+  std::vector<double>trackEndZarray;
+  std::vector<double>trackPFParray;
+  std::vector<double>trackSlicearray;
 
-  std::vector < double > showerStartXarray;
-  std::vector < double > showerStartYarray;
-  std::vector < double > showerStartZarray;
-  std::vector < double > showerDirXarray;
-  std::vector < double > showerDirYarray;
-  std::vector < double > showerDirZarray;
-  std::vector < double > showerLengtharray;
-  std::vector < double > showerAnglearray;
-  std::vector < double > showerPFParray;
-  std::vector < double > showerSlicearray;
+  std::vector<double>showerStartXarray;
+  std::vector<double>showerStartYarray;
+  std::vector<double>showerStartZarray;
+  std::vector<double>showerDirXarray;
+  std::vector<double>showerDirYarray;
+  std::vector<double>showerDirZarray;
+  std::vector<double>showerLengtharray;
+  std::vector<double>showerAnglearray;
+  std::vector<double>showerPFParray;
+  std::vector<double>showerSlicearray;
 
   for (size_t i = 0; i < hitvars.size() - kHitEnd; i += kHitEnd) {
     xarray.push_back(hitvars[i + x]);
@@ -400,9 +400,9 @@ void LoadTPCHits() {
     return;
   }
 
-  std::vector < double > color_ids;
-  std::vector < double > unique_indices;
-  std::vector < double > ::iterator it;
+  std::vector<double>color_ids;
+  std::vector<double>unique_indices;
+  std::vector<double>::iterator it;
 
   if (ColorBySlice) {
     color_ids = SliceID[spill];
