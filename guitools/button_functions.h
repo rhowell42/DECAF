@@ -14,6 +14,7 @@ void doDrawPlane3(bool use);
 void doTimeSel(float minTime, float maxTime);
 void doDrawCRTHits(bool use, float minTime, float maxTime);
 void doDrawFlashes(bool use, float minTime, float maxTime);
+void doDrawReco(bool use);
 
 int runstring;
 int eventstring;

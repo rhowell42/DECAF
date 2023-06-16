@@ -158,6 +158,7 @@ private:
    TGCheckButton       *fOnlyNuSlice;
    TGCheckButton       *fCRTHits;
    TGCheckButton       *fOpFlashes;
+   TGCheckButton       *fReco;
    TGCheckButton       *fCheckPlane1;
    TGCheckButton       *fCheckPlane2;
    TGCheckButton       *fCheckPlane3;
@@ -182,6 +183,7 @@ public:
    void ColorbyPFP();
    void DrawCRTHits();
    void DrawFlashes();
+   void DrawReco();
    void CheckSliceCut();
    void CheckSpillCut();
    void CheckNuSlice();
@@ -240,10 +242,16 @@ MyMainFrame::MyMainFrame() {
    controls->AddFrame(fCRTHits, new TGLayoutHints(kLHintsTop|kLHintsLeft|
                                                        kLHintsExpandX,5,5,5,10));
 
-   fOpFlashes = new TGCheckButton(controls,"Plot Matched Flashes");
+   fOpFlashes = new TGCheckButton(controls,"Plot Optical Flashes");
    fOpFlashes->Connect("Clicked()","MyMainFrame",this,"DrawFlashes()");
    //fOpFlashes->SetState(kButtonDown);
    controls->AddFrame(fOpFlashes, new TGLayoutHints(kLHintsTop|kLHintsLeft|
+                                                       kLHintsExpandX,5,5,5,10));
+
+   fReco = new TGCheckButton(controls,"Plot Reconstructed Objects");
+   fReco->Connect("Clicked()","MyMainFrame",this,"DrawReco()");
+   fReco->SetState(kButtonDown);
+   controls->AddFrame(fReco, new TGLayoutHints(kLHintsTop|kLHintsLeft|
                                                        kLHintsExpandX,5,5,5,10));
 
    TGVButtonGroup *fhits = new TGVButtonGroup(controls, "Draw Hit Options");
@@ -316,7 +324,7 @@ MyMainFrame::MyMainFrame() {
    controls->AddFrame(fCutBoxes);
 
    fTimeSlider = new TGDoubleHSlider(controls,100,kDoubleScaleDownRight,1);
-   fTimeSlider->SetRange(-3000,3000);
+   fTimeSlider->SetRange(-300,300);
    fTimeSlider->SetPosition(0,10);
    fTimeSlider->Connect("PositionChanged()", "MyMainFrame", this, "DoSlider()");
    fTimeSlider->Resize(230,10);
@@ -406,6 +414,10 @@ void MyMainFrame::DrawFlashes() {
   float min = fTimeSlider->GetMinPosition();
   float max  = fTimeSlider->GetMaxPosition();
   doDrawFlashes(pressed, min, max); 
+}
+void MyMainFrame::DrawReco() {
+  bool pressed = fReco->GetState() == kButtonDown;
+  doDrawReco(pressed); 
 }
 void MyMainFrame::CheckPlane1() {
   bool pressed = fCheckPlane1->GetState() == kButtonDown;

@@ -22,6 +22,8 @@
 #include "TGeoVolume.h"
 #include "TGeoMedium.h"
 #include "TEveGeoNode.h"
+#include "TEveLine.h"
+#include "TEveBoxSet.h"
 #include <TEveManager.h>
  
 #include <TEveViewer.h>
@@ -41,8 +43,10 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   hitvars = kHITVARS(sr);
   crtvars = kCRTVARS(sr);
   opvars = kOPVARS(sr);
+  trackvars = kTRACKVARS(sr);
+  showervars = kSHOWERVARS(sr);
 
-  if (hitvars.empty() || crtvars.empty() || opvars.empty()) {
+  if (hitvars.empty() || crtvars.empty() || opvars.empty() || showervars.empty() || trackvars.empty()) {
    return 42;
   }
 
@@ -65,6 +69,26 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   std::vector<double> flashwidthyarray;
   std::vector<double> flashwidthzarray;
   std::vector<double> flashtimearray;
+
+  std::vector<double>  trackStartXarray;
+  std::vector<double>  trackStartYarray;
+  std::vector<double>  trackStartZarray;
+  std::vector<double>  trackEndXarray;
+  std::vector<double>  trackEndYarray;
+  std::vector<double>  trackEndZarray;
+  std::vector<double>  trackPFParray;
+  std::vector<double>  trackSlicearray;
+
+  std::vector<double>  showerStartXarray;
+  std::vector<double>  showerStartYarray;
+  std::vector<double>  showerStartZarray;
+  std::vector<double>  showerDirXarray;
+  std::vector<double>  showerDirYarray;
+  std::vector<double>  showerDirZarray;
+  std::vector<double>  showerLengtharray;
+  std::vector<double>  showerAnglearray;
+  std::vector<double>  showerPFParray;
+  std::vector<double>  showerSlicearray;
 
   for (size_t i = 0; i<hitvars.size()-kHitEnd; i+=kHitEnd) {
    xarray.push_back(hitvars[i+x]);
@@ -92,6 +116,31 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
    flashwidthzarray.push_back(opvars[i+flashwidthz]);
   }
 
+  for (size_t i = 0; i<trackvars.size()-kTrackEnd; i+=kTrackEnd) {
+   trackStartXarray.push_back(trackvars[i+trackstartx]);
+   trackStartYarray.push_back(trackvars[i+trackstarty]);
+   trackStartZarray.push_back(trackvars[i+trackstartz]);
+   trackEndXarray.push_back(trackvars[i+trackendx]);
+   trackEndYarray.push_back(trackvars[i+trackendy]);
+   trackEndZarray.push_back(trackvars[i+trackendz]);
+   trackPFParray.push_back(trackvars[i+trackpfp]);
+   trackSlicearray.push_back(trackvars[i+trackslice]);
+
+  }
+
+  for (size_t i = 0; i<showervars.size()-kShowerEnd; i+=kShowerEnd) {
+   showerStartXarray.push_back(showervars[i+showerstartx]);
+   showerStartYarray.push_back(showervars[i+showerstarty]);
+   showerStartZarray.push_back(showervars[i+showerstartz]);
+   showerDirXarray.push_back(showervars[i+showerdirx]);
+   showerDirYarray.push_back(showervars[i+showerdiry]);
+   showerDirZarray.push_back(showervars[i+showerdirz]);
+   showerLengtharray.push_back(showervars[i+showerlength]);
+   showerAnglearray.push_back(showervars[i+showerangle]);
+   showerPFParray.push_back(showervars[i+showerpfp]);
+   showerSlicearray.push_back(showervars[i+showerslice]);
+  }
+
   X.push_back(xarray);
   Y.push_back(yarray);
   Z.push_back(zarray);
@@ -112,6 +161,26 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
   FlashWidthY.push_back(flashwidthyarray);
   FlashWidthZ.push_back(flashwidthzarray);
 
+  TrackStartX.push_back(trackStartXarray);
+  TrackStartY.push_back(trackStartYarray);
+  TrackStartZ.push_back(trackStartZarray);
+  TrackEndX.push_back(trackEndXarray);
+  TrackEndY.push_back(trackEndYarray);
+  TrackEndZ.push_back(trackEndZarray);
+  TrackPFP.push_back(trackPFParray);
+  TrackSlice.push_back(trackSlicearray);
+
+  ShowerStartX.push_back(showerStartXarray);
+  ShowerStartY.push_back(showerStartYarray);
+  ShowerStartZ.push_back(showerStartZarray);
+  ShowerDirX.push_back(showerDirXarray);
+  ShowerDirY.push_back(showerDirYarray);
+  ShowerDirZ.push_back(showerDirZarray);
+  ShowerLength.push_back(showerLengtharray);
+  ShowerAngle.push_back(showerAnglearray);
+  ShowerPFP.push_back(showerPFParray);
+  ShowerSlice.push_back(showerSlicearray);
+
   run.push_back(kRun(sr));
   event.push_back(kEvt(sr));
 
@@ -119,6 +188,77 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy* sr) -> int {
 
   return 42;
 });
+
+void LoadReco()
+{
+  if (event.empty()) {
+    gMultiView->DestroyEventRPhi();
+
+    gMultiView->DestroyEventRhoZ();
+    gEve->Redraw3D(kFALSE,kTRUE);
+
+   return;
+  }
+
+  auto top = gEve->GetCurrentEvent(); 
+  std::list<TEveElement*> children;
+  top->FindChildren(children,"Reco");
+  for (auto const& child : children) { if (child) { child->Destroy(); } }
+
+  int c = 0;
+
+  for (size_t e = 0; e<TrackStartX[spill].size(); e++) {
+   if (c == 10 || c == 19) { c++; }
+
+   auto line = new TEveLine;
+   line->SetNextPoint(TrackStartX[spill][e],TrackStartY[spill][e],TrackStartZ[spill][e]);
+   line->SetNextPoint(TrackEndX[spill][e],TrackEndY[spill][e],TrackEndZ[spill][e]);
+   if (ColorBySlice) {line->SetMainColor(TrackSlice[spill][e]);}
+   else if (ColorByPFPs) {line->SetMainColor(abs(TrackPFP[spill][e]));}
+   line->SetMainTransparency(25);
+   line->SetLineWidth(5);
+   line->SetElementName("Reco");
+
+   gEve->AddElement(line);
+   top = gEve->GetCurrentEvent();
+
+   gMultiView->DestroyEventRPhi();
+   gMultiView->ImportEventRPhi(top);
+
+   gMultiView->DestroyEventRhoZ();
+   gMultiView->ImportEventRhoZ(top);
+   gEve->Redraw3D(kFALSE,kTRUE);
+   c++;
+  }
+
+  TEveBoxSet* showers = new TEveBoxSet;
+  showers->Reset(TEveBoxSet::kBT_Cone, kFALSE, 64);
+  TEveVector pos, dir;
+  for (size_t e = 0; e<ShowerStartX[spill].size(); e++) {
+    if (c == 10 || c == 19) { c++; }
+
+    pos.Set(ShowerStartX[spill][e],ShowerStartY[spill][e],ShowerStartZ[spill][e]);
+    dir.Set(ShowerDirX[spill][e],ShowerDirY[spill][e],ShowerDirZ[spill][e]);
+    dir*=ShowerLength[spill][e];
+    double radius = TMath::Tan(ShowerAngle[spill][e])*ShowerLength[spill][e];
+
+    showers->AddCone(pos, dir, radius);
+    showers->DigitValue(ShowerPFP[spill][e]);
+    if (ColorBySlice) { showers->DigitColor(ShowerSlice[spill][e],25);}
+    else if (ColorByPFPs) {showers->DigitColor(abs(ShowerPFP[spill][e]),25);}
+  }
+  showers->SetElementName("Reco");
+  showers->RefitPlex();
+  gEve->AddElement(showers);
+  top = gEve->GetCurrentEvent();
+
+  gMultiView->DestroyEventRPhi();
+  gMultiView->ImportEventRPhi(top);
+
+  gMultiView->DestroyEventRhoZ();
+  gMultiView->ImportEventRhoZ(top);
+  gEve->Redraw3D(kFALSE,kTRUE);
+}
 
 void LoadFlashes(float min, float max)
 {
@@ -306,6 +446,9 @@ void doAdvanceSpill(float min, float max)
    if (PlotFlashes) { 
      LoadFlashes(min, max); 
    }
+   if (PlotReco) {
+     LoadReco();
+   }
    runstring = run[spill];
    eventstring = event[spill];
   }
@@ -322,6 +465,9 @@ void doPreviousSpill(float min, float max)
    if (PlotFlashes) { 
      LoadFlashes(min, max); 
    }
+   if (PlotReco) {
+     LoadReco();
+   }
    runstring = run[spill];
    eventstring = event[spill];
   }
@@ -335,6 +481,9 @@ void doColorbySlice()
   top->FindChildren(children,"TPC Hits");
   for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
+   if (PlotReco) {
+     LoadReco();
+   }
 }
 void doColorbyPFP()
 {
@@ -345,6 +494,9 @@ void doColorbyPFP()
   top->FindChildren(children,"TPC Hits");
   for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
+   if (PlotReco) {
+     LoadReco();
+   }
 }
 void doDrawCRTHits(bool pressed, float min, float max)
 {
@@ -373,6 +525,21 @@ void doDrawFlashes(bool pressed, float min, float max)
    for (auto const& child : children) { if (child) { child->Destroy(); } }
   }
 }
+void doDrawReco(bool pressed)
+{
+  auto top = gEve->GetCurrentEvent(); 
+  if (pressed) {
+   PlotReco = true;
+   LoadReco(); 
+  }
+  else {
+   PlotReco = false;
+   auto top = gEve->GetCurrentEvent(); 
+   std::list<TEveElement*> children;
+   top->FindChildren(children,"Reco");
+   for (auto const& child : children) { if (child) { child->Destroy(); } }
+  }
+}
 void doUseSliceCuts(std::vector<int> cut_indices)
 {
   useSliceCuts = true;
@@ -383,6 +550,9 @@ void doUseSliceCuts(std::vector<int> cut_indices)
   top->FindChildren(children,"TPC Hits");
    for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
+   if (PlotReco) {
+     LoadReco();
+   }
 }
 void doUseSpillCuts(std::vector<int> cut_indices)
 {
@@ -394,6 +564,9 @@ void doUseSpillCuts(std::vector<int> cut_indices)
   top->FindChildren(children,"TPC Hits");
    for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
+   if (PlotReco) {
+     LoadReco();
+   }
 }
 void doUseNuSlice(bool pressed)
 {
@@ -404,6 +577,9 @@ void doUseNuSlice(bool pressed)
   top->FindChildren(children,"TPC Hits");
    for (auto const& child : children) { if (child) { child->Destroy(); } }
   LoadTPCHits();
+   if (PlotReco) {
+     LoadReco();
+   }
 }
 void doDrawPlane1(bool pressed)
 {
@@ -459,6 +635,26 @@ void GetSpectrumSelection()
   FlashTime.clear();
   FlashWidthY.clear();
   FlashWidthZ.clear();
+
+  TrackStartX.clear();
+  TrackStartY.clear();
+  TrackStartZ.clear();
+  TrackEndX.clear();
+  TrackEndY.clear();
+  TrackEndZ.clear();
+  TrackPFP.clear();
+  TrackSlice.clear();
+
+  ShowerStartX.clear();
+  ShowerStartY.clear();
+  ShowerStartZ.clear();
+  ShowerDirX.clear();
+  ShowerDirY.clear();
+  ShowerDirZ.clear();
+  ShowerLength.clear();
+  ShowerAngle.clear();
+  ShowerPFP.clear();
+  ShowerSlice.clear();
 
   run.clear();
   event.clear();
@@ -710,5 +906,6 @@ void event_display(const std::string inputName)
   gEve->AddEvent(new TEveEventManager("Event", "ICARUS CAF Event"));
   GetSpectrumSelection();
   LoadTPCHits();
+  LoadReco();
   gEve->Redraw3D(kTRUE); // Reset camera after the first event has been shown.
 }

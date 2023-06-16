@@ -94,3 +94,75 @@ const SpillMultiVar kOPVARS([](const caf::SRSpillProxy* sr) -> std::vector<doubl
   }
   return hits;
 });
+const SpillMultiVar kTRACKVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+  std::vector<double> hits;
+  int sliceID = 0;
+  for (const auto& slc: sr->slc) {
+    bool useSlice = true;
+    if (useSliceCuts) { 
+      for (const auto& i_cut : sliceCutIndices) { 
+        const auto& cut = slice_cuts[i_cut];
+        if (!cut(&slc)) { 
+          useSlice = false; 
+          break; 
+        } 
+      } 
+    }
+    if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
+    if (!useSlice) { continue; }
+    for (const auto& pfp : slc.reco.pfp) {
+      if (pfp.trackScore > 0.5 && pfp.trackScore < 1.0 && !isnan(pfp.trk.start.x)) {
+        hits.push_back(pfp.trk.start.x);
+        hits.push_back(pfp.trk.start.y);
+        hits.push_back(pfp.trk.start.z);
+        hits.push_back(pfp.trk.end.x);
+        hits.push_back(pfp.trk.end.y);
+        hits.push_back(pfp.trk.end.z);
+        int cryo;
+        if (pfp.trk.start.x > 0) { cryo = 1; }
+        else { cryo =-1; }
+        hits.push_back(pfp.id*cryo);
+        hits.push_back(sliceID);
+      }
+    }
+    sliceID++; 
+  }
+  return hits;
+});
+const SpillMultiVar kSHOWERVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
+  std::vector<double> hits;
+  int sliceID = 0;
+  for (const auto& slc: sr->slc) {
+    bool useSlice = true;
+    if (useSliceCuts) { 
+      for (const auto& i_cut : sliceCutIndices) { 
+        const auto& cut = slice_cuts[i_cut];
+        if (!cut(&slc)) { 
+          useSlice = false; 
+          break; 
+        } 
+      } 
+    }
+    if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
+    if (!useSlice) { continue; }
+    for (const auto& pfp : slc.reco.pfp) {
+      if (pfp.trackScore <= 0.5 && pfp.trackScore > 0 && !isnan(pfp.shw.start.x)) {
+        hits.push_back(pfp.shw.start.x);
+        hits.push_back(pfp.shw.start.y);
+        hits.push_back(pfp.shw.start.z);
+        hits.push_back(pfp.shw.dir.x);
+        hits.push_back(pfp.shw.dir.y);
+        hits.push_back(pfp.shw.dir.z);
+        hits.push_back(pfp.shw.len);
+        hits.push_back(pfp.shw.open_angle);
+        int cryo;
+        if (pfp.shw.start.x > 0) { cryo = 1; }
+        else { cryo =-1; }
+        hits.push_back(pfp.id*cryo);
+        hits.push_back(sliceID);
+      }
+    }
+    sliceID++; 
+  }
+  return hits;
+});
