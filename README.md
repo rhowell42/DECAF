@@ -2,23 +2,20 @@
 3D event display to work with CAF files in the SBN collaboration.
 
 ## Introduction
-This is a lightweight event display that runs on caf and flatcaf files from events generated in the ICARUS LArTPCs. The purpose of this event display is to provide a user-friendly debugging tool for neutrino/cosmic ray analyses and reconstruction efforts. It contains a click-and-drag rotatable, mouse wheel zoom and pan 3D display, selectable hit coloring options, and buttons for advancing to either the next spill in the CAF file or the previous one.
+This is a lightweight event display that runs on caf and flatcaf files from events generated in the ICARUS LArTPCs. The purpose of this event display is to provide a user-friendly debugging tool for neutrino/cosmic ray analyses and reconstruction efforts. It contains a click-and-drag rotatable, mouse wheel zoom and pan 3D display, selectable hit coloring options, and buttons for advancing to either the next spill in the CAF file or the previous one. It will also plot reconstructed tracks/showers as lines/cones respectively relate to their `pfp.trackScore`.
 
-The event display utilizes recob::Hit and recob::SpacePoint information added to the CAFs in [SBNSoftware/sbnanaobj](https://github.com/SBNSoftware/sbnanaobj/tree/develop) version v09_19_02 and [SBNSoftware/sbncode](https://github.com/SBNSoftware/sbncode/tree/develop) version v09_58_02.
+You can run this event display over any CAF file made with sbnanaobj v09_16_09 and sbncode v09_63_00. The event display also utilizes recob::Hit and recob::SpacePoint information added to the CAFs in [SBNSoftware/sbnanaobj](https://github.com/SBNSoftware/sbnanaobj/tree/develop) version v09_19_02 and [SBNSoftware/sbncode](https://github.com/SBNSoftware/sbncode/tree/develop) version v09_58_02. These objects to not have to filled in order to run this display!
 
 Some data events from run 7418 are available for you to check out here: `/icarus/app/users/rhowell/SRHits/test.flat.caf.root`
 
 ## How to Use
 ### Base Use
-1. On an ICARUS gpvm, go to your working area and clone this repository `git clone https://github.com/rhowell42/DECAF.git`
-3. Setup the relevant SBNSoftware/sbnana version `setup sbnana -v v09_58_02 -q e20:prof` 
-   -N.B. You need version v09_58_02 or later. `scripts/setup_online.sh` does this for you
+1. `git clone https://github.com/rhowell42/DECAF.git` # On an ICARUS gpvm, go to your working area and clone this repository.
+3. `scripts/setup_online.sh` #Setup the relevant SBNSoftware/sbnana version `setup sbnana -v v09_58_02 -q e20:prof` 
+   -N.B. You need version v09_58_02 or later.
 4. Start your vncserver if you haven't already. Instructions for doing this [here](https://sbnsoftware.github.io/sbndcode_wiki/Viewing_events_remotely_with_VNC.html) if you haven't done this before.
 5. Add any slice and/or spill cuts you might want to select in the respective vectors in `cut_helper.h`
-5. In that same working area, run `cafe event_display.C {path/to/your/file.caf.root}`
-6. ???
-7. Profit
-
+5. `cafe event_display.C {path/to/your/file.caf.root}` # Where you cloned the git repo. If want to run over multiple files, add quotation marks around the argument: `cafe event_display.C `"path/to/your/files*.caf.root"`
 
 ### Generate Your Own CAFs
 You will need your own copy of [cafmakerjob_icarus.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus.fcl) ([cafmakerjob_icarus_data.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus_data.fcl) if you want to look at data). There you will add the line `cafmaker.FillHits: true` which will fill all of the SRHit and SRSpacePoint information needed to use the event display. Then run `lar -c cafmakerjob_icarus{_data}.fcl` as usual.
