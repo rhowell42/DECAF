@@ -114,6 +114,8 @@ MultiView* gMultiView = 0;
 
 int spill = 0; 
 int nSpills = 0;
+int detector = 0;
+
 
 void GetSpectrumSelection();
 
