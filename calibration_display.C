@@ -405,7 +405,38 @@ void LoadTPCHits() {
             gEve->AddEvent(new TEveEventManager("Event", "ICARUS CAF Event"));
         }
 
-        myChain->Add("/pnfs/icarus/persistent/calibration/calib_ntuples/mc/2022A/BNB_in-time_Cosmics/00/0a/hist_prodcorsika_proton_intime_icarus_bnb_sce_on_ovb_gen_g4_detsim_reco1_31493898_3772_reco2-70d3d51a-6bd4-416b-964d-a3aaa7ae632e.root");
+        std::string data_or_mc = "data";
+
+  int which_10th = 9;
+
+  if (data_or_mc == "data") {
+    vector<string> file_list = make_directory_list("scripts/bnbfiles6819_8459.txt");
+    //vector<string> file_list = make_directory_list("/icarus/app/users/gputnam/calib-ana/bnbfiles.list");
+    int file_list_size = file_list.size();
+    int file_list_10th = file_list_size / 10;  
+    if (which_10th < 9) {
+      for (int i=0; i<file_list_10th; i++) {
+        const char *file = file_list[which_10th*file_list_10th + i].c_str();
+        myChain->Add(file);
+    }}
+    else {
+      if (which_10th == 9) {
+        int max_i = file_list_10th + (file_list_size % 10);
+        for (int i=0; i<max_i; i++) {
+          const char *file = file_list[which_10th*file_list_10th + i].c_str();
+          myChain->Add(file);
+      }}
+      else {
+        cout<<"which_10th must be an integer >= 0 and < 10"<<endl;
+        return;
+  }}}
+
+  else if (data_or_mc == "mc") {
+    vector<string> file_list = make_directory_list("scripts/MCdirectories.txt");
+    for (int i=0; i<file_list.size(); i++) {
+       const char *file = ("/pnfs/icarus/scratch/users/gputnam/MCP2022G/cosmic/"+file_list[i]+"/Supplemental*stage1.root").c_str();
+       myChain->Add(file);
+  }}
         myReader.SetEntry(event_id);
         myReader.Next();
         //eventstring = event;
