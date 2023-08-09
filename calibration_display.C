@@ -106,8 +106,7 @@ void LoadTPCHits() {
     marker0->SetOwnIds(kTRUE);
 
     if (DrawPlane1) {
-        //for (size_t e; e < nhit0; e++) {
-        for (size_t e; e < plane0_x.GetSize(); e++) {
+        for (size_t e=0; e < plane0_x.GetSize(); e++) {
             marker0->SetNextPoint(plane0_x[e],plane0_y[e],plane0_z[e]);
             marker0->SetPointId(new TNamed(Form("Point %zu Plane 0", e), ""));
         }
@@ -122,9 +121,8 @@ void LoadTPCHits() {
     auto marker1 = new TEvePointSet();
     marker1->SetOwnIds(kTRUE);
 
-    if (DrawPlane1) {
-        //for (size_t e; e < nhit1; e++) {
-        for (size_t e; e < plane1_x.GetSize(); e++) {
+    if (DrawPlane2) {
+        for (size_t e=0; e < plane1_x.GetSize(); e++) {
             marker1->SetNextPoint(plane1_x[e],plane1_y[e],plane1_z[e]);
             marker1->SetPointId(new TNamed(Form("Point %zu Plane 1", e), ""));
         }
@@ -139,16 +137,15 @@ void LoadTPCHits() {
     auto marker2 = new TEvePointSet();
     marker2->SetOwnIds(kTRUE);
 
-    if (DrawPlane2) {
-        //for (size_t e; e < nhit2; e++) {
-        for (size_t e; e < plane2_x.GetSize(); e++) {
+    if (DrawPlane3) {
+        for (size_t e=0; e < plane2_x.GetSize(); e++) {
             marker2->SetNextPoint(plane2_x[e],plane2_y[e],plane2_z[e]);
             marker2->SetPointId(new TNamed(Form("Point %zu Plane 2", e), ""));
         }
 
         marker2->SetMarkerSize(.4);
         marker2->SetMarkerStyle(8);
-        marker2->SetMainColor(3);
+        marker2->SetMainColor(5);
         marker2->SetElementName("TPC Hits");
         gEve->AddElement(marker2);
     }
@@ -169,7 +166,9 @@ void LoadTPCHits() {
             myReader.Next();
             //eventstring = event;
             //runstring = run;
+        if (PlotReco) {
             LoadReco();
+        }
             LoadTPCHits();
         }
     }
@@ -180,7 +179,9 @@ void LoadTPCHits() {
             myReader.Next();
             //eventstring = event;
             //runstring = run;
+        if (PlotReco) {
             LoadReco();
+        }
             LoadTPCHits();
         }
     }
