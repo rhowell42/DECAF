@@ -76,19 +76,33 @@ struct MultiView
          fRPhiGeomScene->AddElement(a);
       }
 
-      fRhoZMgr = new TEveProjectionManager(TEveProjection::kPT_RhoZ);
-      gEve->AddToListTree(fRhoZMgr, kFALSE);
-      {
-         TEveProjectionAxes* a = new TEveProjectionAxes(fRhoZMgr);
-         a->SetMainColor(kWhite);
-         a->SetTitle("Rho-Z");
-         a->SetTitleSize(0.05);
-         a->SetTitleFont(102);
-         a->SetLabelSize(0.025);
-         a->SetLabelFont(102);
-         fRhoZGeomScene->AddElement(a);
-      }
-
+      #if ROOT_VERSION_CODE <= ROOT_VERSION(6,26,5)
+        fRhoZMgr = new TEveProjectionManager(TEveProjection::kPT_ZX);
+        gEve->AddToListTree(fRhoZMgr, kFALSE);
+        {
+          TEveProjectionAxes* a = new TEveProjectionAxes(fRhoZMgr);
+          a->SetMainColor(kWhite);
+          a->SetTitle("Rho-Z");
+          a->SetTitleSize(0.05);
+          a->SetTitleFont(102);
+          a->SetLabelSize(0.025);
+          a->SetLabelFont(102);
+          fRhoZGeomScene->AddElement(a);
+        }
+      #else
+        fRhoZMgr = new TEveProjectionManager(TEveProjection::kPT_RhoZ);
+        gEve->AddToListTree(fRhoZMgr, kFALSE);
+        {
+          TEveProjectionAxes* a = new TEveProjectionAxes(fRhoZMgr);
+          a->SetMainColor(kWhite);
+          a->SetTitle("Rho-Z");
+          a->SetTitleSize(0.05);
+          a->SetTitleFont(102);
+          a->SetLabelSize(0.025);
+          a->SetLabelFont(102);
+          fRhoZGeomScene->AddElement(a);
+        }
+      #endif
 
       // Viewers
       //=========
@@ -116,10 +130,15 @@ struct MultiView
 
       pack->NewSlot()->MakeCurrent();
       fRhoZView = gEve->SpawnNewViewer("Top View", "");
-      fRhoZView->GetGLViewer()->SetCurrentCamera(TGLViewer::kCameraPerspYOZ);
-    //  fRhoZView->GetGLViewer()->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
-      fRhoZView->AddScene(gEve->GetGlobalScene());
-      fRhoZView->AddScene(gEve->GetEventScene());
+      #if ROOT_VERSION_CODE <= ROOT_VERSION(6,26,5)
+        fRhoZView->GetGLViewer()->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
+        fRhoZView->AddScene(fRhoZGeomScene);
+        fRhoZView->AddScene(fRhoZEventScene);
+      #else
+        fRhoZView->GetGLViewer()->SetCurrentCamera(TGLViewer::kCameraPerspYOZ);
+        fRhoZView->AddScene(gEve->GetGlobalScene());
+        fRhoZView->AddScene(gEve->GetEventScene());
+      #endif
    }
 
    //---------------------------------------------------------------------------

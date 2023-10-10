@@ -474,6 +474,7 @@ void LoadTPCHits() {
     marker->SetMainColor(1 + c);
     marker->SetElementName("TPC Hits");
     gEve->AddElement(marker);
+    c++;
   }
     auto top = gEve->GetCurrentEvent();
 
@@ -483,7 +484,6 @@ void LoadTPCHits() {
     gMultiView->DestroyEventRhoZ();
     gMultiView->ImportEventRhoZ(top);
     gEve->Redraw3D(kFALSE, kTRUE);
-    c++;
   }
 }
 
