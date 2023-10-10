@@ -342,6 +342,7 @@ void LoadFlashes(float min, float max) {
 
     box->SetElementName("Op Flashes");
     gEve->AddElement(box);
+    c++;
     }
 
     auto top = gEve->GetCurrentEvent();
@@ -352,7 +353,6 @@ void LoadFlashes(float min, float max) {
     gMultiView->DestroyEventRhoZ();
     gMultiView->ImportEventRhoZ(top);
     gEve->Redraw3D(kFALSE, kTRUE);
-    c++;
   }
 }
 
