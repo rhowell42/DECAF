@@ -30,6 +30,12 @@ bool onlyNuSlice = true;
 
 std::vector<int> sliceCutIndices;
 
+
+const SpillVar kDETECTOR([](const caf::SRSpillProxy* sr) -> double {
+  const auto& head = sr->hdr;
+  return head.det;
+});
+
 const SpillMultiVar kHITVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   int sliceID = 0;

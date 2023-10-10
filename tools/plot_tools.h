@@ -114,8 +114,26 @@ MultiView* gMultiView = 0;
 
 int spill = 0; 
 int nSpills = 0;
+int detector = 0;
+
 
 void GetSpectrumSelection();
+
+vector<string> make_directory_list(const char* filename) {
+   // open the txt file
+   ifstream file;
+   file.open(filename);
+
+   // declare variables for use in saving the directory names
+   string name;
+   vector<string> directory_list;
+
+   while (file >> name) {
+      directory_list.push_back("root://fndca1.fnal.gov:1094/pnfs/fnal.gov/usr/icarus/persistent/calibration/calib_ntuples/data/"+name);
+      //directory_list.push_back("/pnfs/icarus/persistent/calibration/calib_ntuples/data/"+name);
+   }
+   return directory_list;
+}
 
 template<typename T>
 std::vector<int> findItems(std::vector<T> const &v, int target) {
