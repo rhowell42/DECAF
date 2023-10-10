@@ -76,7 +76,7 @@ struct MultiView
          fRPhiGeomScene->AddElement(a);
       }
 
-      #if ROOT_VERSION_CODE <= ROOT_VERSION(6,26,5)
+      #if ROOT_VERSION_CODE >= ROOT_VERSION(6,26,5)
         fRhoZMgr = new TEveProjectionManager(TEveProjection::kPT_ZX);
         gEve->AddToListTree(fRhoZMgr, kFALSE);
         {
@@ -130,7 +130,7 @@ struct MultiView
 
       pack->NewSlot()->MakeCurrent();
       fRhoZView = gEve->SpawnNewViewer("Top View", "");
-      #if ROOT_VERSION_CODE <= ROOT_VERSION(6,26,5)
+      #if ROOT_VERSION_CODE >= ROOT_VERSION(6,26,5)
         fRhoZView->GetGLViewer()->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
         fRhoZView->AddScene(fRhoZGeomScene);
         fRhoZView->AddScene(fRhoZEventScene);
