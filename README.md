@@ -18,7 +18,7 @@ Some data events from run 7418 are available for you to check out here: `/icarus
 5. `cafe event_display.C {path/to/your/file.caf.root}` # Where you cloned the git repo. If want to run over multiple files, add quotation marks around the argument: `cafe event_display.C `"path/to/your/files*.caf.root"`
 
 ### Generate Your Own CAFs
-You will need your own copy of [cafmakerjob_icarus.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus.fcl) ([cafmakerjob_icarus_data.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus_data.fcl) if you want to look at data). There you will add the line `cafmaker.FillHits: true` which will fill all of the SRHit and SRSpacePoint information needed to use the event display. Then run `lar -c cafmakerjob_icarus{_data}.fcl` as usual.
+If you want to save and display TPC hits, you will need your own copy of [cafmakerjob_icarus.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus.fcl) ([cafmakerjob_icarus_data.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus_data.fcl) if you want to look at data). There you will add the line `cafmaker.FillHits: true` which will fill all of the SRHit and SRSpacePoint information needed to use the event display. Then run `lar -c cafmakerjob_icarus{_data}.fcl` as usual.
 
 `scripts/cafmakerjob_icarus{_data}.fcl` already has these lines in them, so feel free to use those to generate the CAFs.
 
