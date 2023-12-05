@@ -385,7 +385,7 @@ void MyMainFrame::CheckSliceCut() {
     indices.push_back(e->EntryId());
   }
   fSelected->Clear();
-  doUseSliceCuts(indices);
+  doUseSliceCuts(indices,fTimeSlider->GetMinPosition(),fTimeSlider->GetMaxPosition());
 }
 void MyMainFrame::CheckSpillCut() {
   fSpillBox->GetSelectedEntries(fSelected);
@@ -396,11 +396,11 @@ void MyMainFrame::CheckSpillCut() {
     indices.push_back(e->EntryId());
   }
   fSelected->Clear();
-  doUseSpillCuts(indices);
+  doUseSpillCuts(indices,fTimeSlider->GetMinPosition(),fTimeSlider->GetMaxPosition());
 }
 void MyMainFrame::CheckNuSlice() {
   bool pressed = fOnlyNuSlice->GetState() == kButtonDown;
-  doUseNuSlice(pressed);
+  doUseNuSlice(pressed,fTimeSlider->GetMinPosition(), fTimeSlider->GetMaxPosition());
 }
 void MyMainFrame::DrawCRTHits() {
   bool pressed = fCRTHits->GetState() == kButtonDown;

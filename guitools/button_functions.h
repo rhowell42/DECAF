@@ -5,9 +5,9 @@ void doUpdateStatusBar();
 void doColorbySlice();
 void doColorbyPFP();
 
-void doUseSliceCuts(std::vector<int> cut_indices);
-void doUseSpillCuts(std::vector<int> cut_indices);
-void doUseNuSlice(bool use);
+void doUseSliceCuts(std::vector<int> cut_indices, float minTime, float maxTime);
+void doUseSpillCuts(std::vector<int> cut_indices, float minTime, float maxTime);
+void doUseNuSlice(bool use, float minTime, float maxTime);
 void doDrawPlane1(bool use);
 void doDrawPlane2(bool use);
 void doDrawPlane3(bool use);

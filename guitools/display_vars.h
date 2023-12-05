@@ -109,7 +109,7 @@ const SpillMultiVar kTRACKVARS([](const caf::SRSpillProxy* sr) -> std::vector<do
       } 
     }
     if (onlyNuSlice) { if (!kSlcIsRecoNu(&slc)) {useSlice = false; } }
-    if (!useSlice) { continue; }
+    if (!useSlice) { std::cout<<"skipping this slice "<<sliceID<<std::endl; continue; }
     for (const auto& pfp : slc.reco.pfp) {
       if (pfp.trackScore > 0.5 && pfp.trackScore < 1.0 && !isnan(pfp.trk.start.x)) {
         hits.push_back(pfp.trk.start.x);
@@ -134,7 +134,7 @@ const SpillMultiVar kSHOWERVARS([](const caf::SRSpillProxy* sr) -> std::vector<d
   int sliceID = 0;
   for (const auto& slc: sr->slc) {
     bool useSlice = true;
-    if (useSliceCuts) { 
+    if (useSliceCuts) {
       for (const auto& i_cut : sliceCutIndices) { 
         const auto& cut = slice_cuts[i_cut];
         if (!cut(&slc)) { 

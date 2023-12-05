@@ -33,7 +33,7 @@
 #include "TMarker3DBox.h"
 
 using namespace ana;
-
+int test = 0;
 const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
   hitvars = kHITVARS(sr);
   crtvars = kCRTVARS(sr);
@@ -41,7 +41,7 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
   trackvars = kTRACKVARS(sr);
   showervars = kSHOWERVARS(sr);
   detector = kDETECTOR(sr);
-
+  
   std::vector<double>xarray;
   std::vector<double>yarray;
   std::vector<double>zarray;
@@ -132,7 +132,6 @@ const SpillVar kFindEvents([](const caf::SRSpillProxy *sr)->int {
   FlashWidthY.push_back(flashwidthyarray);
   FlashWidthZ.push_back(flashwidthzarray);
   }
-
   if (!trackvars.empty()) {
   for (size_t i = 0; i < trackvars.size() - kTrackEnd; i += kTrackEnd) {
     trackStartXarray.push_back(trackvars[i + trackstartx]);
@@ -207,7 +206,6 @@ void LoadReco() {
       child->Destroy();
     }
   }
-
   if (!TrackStartX.empty()) {
   int c = 0;
   for (size_t e = 0; e < TrackStartX[spill].size(); e++) {
@@ -605,7 +603,7 @@ void doDrawReco(bool pressed) {
     }
   }
 }
-void doUseSliceCuts(std::vector < int > cut_indices) {
+void doUseSliceCuts(std::vector<int> cut_indices, float min, float max) {
   useSliceCuts = true;
   sliceCutIndices = cut_indices;
   GetSpectrumSelection();
@@ -619,11 +617,19 @@ void doUseSliceCuts(std::vector < int > cut_indices) {
     }
   }
   LoadTPCHits();
-  if (PlotReco) {
-    LoadReco();
-  }
+    if (PlotCRTHits) {
+      LoadCRTHits(min, max);
+    }
+    if (PlotFlashes) {
+      LoadFlashes(min, max);
+    }
+    if (PlotReco) {
+      LoadReco();
+    }
+    runstring = run[spill];
+    eventstring = event[spill];
 }
-void doUseSpillCuts(std::vector < int > cut_indices) {
+void doUseSpillCuts(std::vector<int> cut_indices, float min, float max) {
   useSpillCuts = true;
   spillCutIndices = cut_indices;
   GetSpectrumSelection();
@@ -637,12 +643,21 @@ void doUseSpillCuts(std::vector < int > cut_indices) {
     }
   }
   LoadTPCHits();
-  if (PlotReco) {
-    LoadReco();
-  }
+    if (PlotCRTHits) {
+      LoadCRTHits(min, max);
+    }
+    if (PlotFlashes) {
+      LoadFlashes(min, max);
+    }
+    if (PlotReco) {
+      LoadReco();
+    }
+    runstring = run[spill];
+    eventstring = event[spill];
 }
-void doUseNuSlice(bool pressed) {
+void doUseNuSlice(bool pressed, float min, float max) {
   onlyNuSlice = pressed;
+  test = 0;
   GetSpectrumSelection();
   auto top = gEve->GetCurrentEvent();
   std::list < TEveElement *> children;
@@ -654,9 +669,17 @@ void doUseNuSlice(bool pressed) {
     }
   }
   LoadTPCHits();
-  if (PlotReco) {
-    LoadReco();
-  }
+    if (PlotCRTHits) {
+      LoadCRTHits(min, max);
+    }
+    if (PlotFlashes) {
+      LoadFlashes(min, max);
+    }
+    if (PlotReco) {
+      LoadReco();
+    }
+    runstring = run[spill];
+    eventstring = event[spill];
 }
 void doDrawPlane1(bool pressed) {
   DrawPlane1 = pressed;
