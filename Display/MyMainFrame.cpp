@@ -140,10 +140,10 @@ MyMainFrame::MyMainFrame(const char* fname)
 }
 
 //-----------------------------------------------------------------------------
-// Destructor: Clean up resources
+// Destructor
 //-----------------------------------------------------------------------------
 MyMainFrame::~MyMainFrame() {
-  delete fEventDisplay;   // First delete controlled object
+  delete fEventDisplay;   
 }
 
 //-----------------------------------------------------------------------------

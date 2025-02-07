@@ -27,12 +27,14 @@ bool onlyNuSlice = true;
 
 std::vector<int> sliceCutIndices;
 
-
+// Get detector information
 const SpillVar kDETECTOR([](const caf::SRSpillProxy* sr) -> double {
   const auto& head = sr->hdr;
   return head.det;
 });
 
+// Load data variables
+// Keep 
 const SpillMultiVar kHITVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   int sliceID = 0;
@@ -64,6 +66,7 @@ const SpillMultiVar kHITVARS([](const caf::SRSpillProxy* sr) -> std::vector<doub
   }
   return hits;
 });
+
 const SpillMultiVar kCRTVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   for (const auto& hit : sr->crt_hits) {
@@ -75,6 +78,7 @@ const SpillMultiVar kCRTVARS([](const caf::SRSpillProxy* sr) -> std::vector<doub
   }
   return hits;
 });
+
 const SpillMultiVar kOPVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   for (const auto& hit : sr->opflashes) {
@@ -91,6 +95,7 @@ const SpillMultiVar kOPVARS([](const caf::SRSpillProxy* sr) -> std::vector<doubl
   }
   return hits;
 });
+
 const SpillMultiVar kTRACKVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   int sliceID = 0;
@@ -126,6 +131,7 @@ const SpillMultiVar kTRACKVARS([](const caf::SRSpillProxy* sr) -> std::vector<do
   }
   return hits;
 });
+
 const SpillMultiVar kSHOWERVARS([](const caf::SRSpillProxy* sr) -> std::vector<double> {
   std::vector<double> hits;
   int sliceID = 0;

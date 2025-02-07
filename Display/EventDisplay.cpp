@@ -8,8 +8,9 @@
 #include "EventDisplay.h"
 #include "DisplayVars.h"
 
-
+//-----------------------------------------------------------------------------
 // Constructor/Destructor
+//-----------------------------------------------------------------------------
 EventDisplay::EventDisplay(const char* fname) 
     : m_filename(fname) 
 {
@@ -21,7 +22,9 @@ EventDisplay::~EventDisplay() {
     delete m_multiView;
 }
 
-// Initialize the Display
+//-----------------------------------------------------------------------------
+// Initialize the display
+//-----------------------------------------------------------------------------
 void EventDisplay::InitializeDisplay() {
     // TEve initialization
     m_eve = TEveManager::Create();
@@ -39,7 +42,9 @@ void EventDisplay::InitializeDisplay() {
     m_eve->AddEvent(new TEveEventManager("Event", managerName.c_str()));
 }
 
-// Load the geometry
+//-----------------------------------------------------------------------------
+// Load the geometry, select the detector being simulated
+//-----------------------------------------------------------------------------
 void EventDisplay::SetupGeometry() {
     TEveGeoShape *gentle_geom = 0;
 
@@ -67,11 +72,14 @@ void EventDisplay::SetupGeometry() {
     m_eve->AddGlobalElement(m_geometry);
 }
 
-// Data loading
+//-----------------------------------------------------------------------------
+// Load data, fill all asked-for data fields
+//-----------------------------------------------------------------------------
 void EventDisplay::LoadData() {
     SpectrumLoader loader(m_filename);
     const Binning bins = Binning::Simple(1, 0, 1);
     
+    // cafana variable to use to fill data
     const SpillVar kFindEvents([this](const caf::SRSpillProxy *sr)->int {
         SpillData sd;
 
@@ -138,16 +146,22 @@ void EventDisplay::LoadData() {
             sd.flashes.widthZ.push_back(flashvars[i + flashwidthz]);
         }
 
+        //Get run information
         sd.run = kRun(sr);
         sd.event = kEvt(sr);
+
         m_spills.push_back(sd);
         return 1.0;
     });
 
+    // Run cafana selection
     Spectrum sFindSpill("", bins, loader, kFindEvents, m_combinedSpillCut, kSpillUnweighted);
     loader.Go();
 }
 
+//-----------------------------------------------------------------------------
+// Apply user-supplied event selections
+//-----------------------------------------------------------------------------
 // Cumulatively apply spill cuts
 void EventDisplay::ApplySpillCuts(const std::vector<int>& cuts) {
   for (auto cut: cuts) {
@@ -157,13 +171,14 @@ void EventDisplay::ApplySpillCuts(const std::vector<int>& cuts) {
 }
 
 // Cumulatively apply slice cuts
-
 void EventDisplay::ApplySliceCuts(const std::vector<int>& cuts) {
     std::cout<<"Slice cuts are not supported yet"<<std::endl;
 }
 
-
-// Visualization methods
+//-----------------------------------------------------------------------------
+// Visualize methods
+//-----------------------------------------------------------------------------
+// Draw reconstructed tracks
 void EventDisplay::DrawTracks() {
     const auto& tracks = m_spills[m_currentSpill].tracks;
     auto* lines = new TEveLine("Tracks");
@@ -183,6 +198,7 @@ void EventDisplay::DrawTracks() {
     m_eve->AddElement(lines);
 }
 
+// Draw reconstructed hits
 void EventDisplay::DrawTPCHits() {
     auto* hitPoints = new TEvePointSet("TPC Hits");
     hitPoints->SetMarkerStyle(8);
@@ -206,6 +222,7 @@ void EventDisplay::DrawTPCHits() {
     m_eve->AddElement(hitPoints);
 }
 
+// Draw Cosmic Ray Tagger hits
 void EventDisplay::DrawCRTHits() {
     auto* crtPoints = new TEvePointSet("CRT Hits");
     crtPoints->SetMarkerStyle(4);
@@ -221,6 +238,7 @@ void EventDisplay::DrawCRTHits() {
     m_eve->AddElement(crtPoints);
 }
 
+// Draw PMT optical flashes
 void EventDisplay::DrawFlashes() {
     auto* flashBoxes = new TEveBoxSet("Flashes");
     flashBoxes->Reset(TEveBoxSet::kBT_AABox, true, 64);
@@ -241,6 +259,7 @@ void EventDisplay::DrawFlashes() {
     m_eve->AddElement(flashBoxes);
 }
 
+// Draw electromagnetic showers
 void EventDisplay::DrawShowers() {
     auto* showers = new TEveBoxSet("Showers");
     showers->Reset(TEveBoxSet::kBT_Cone, true, 64);
@@ -265,6 +284,7 @@ void EventDisplay::DrawShowers() {
     m_eve->AddElement(showers);
 }
 
+// Run all desired visualize methods
 void EventDisplay::DrawAll() {
     m_eve->GetCurrentEvent()->DestroyElements();
 
@@ -283,22 +303,9 @@ void EventDisplay::DrawAll() {
     UpdateViews();
 }
 
-// Control configurations
-void EventDisplay::ToggleFlashes(bool enable) {
-    m_config.showFlashes = enable;
-    DrawAll();
-}
-
-void EventDisplay::ToggleCRTHits(bool enable) {
-    m_config.showCRT = enable;
-    DrawAll();
-}
-
-void EventDisplay::ToggleReco(bool enable) {
-    m_config.showReco = enable;
-    DrawAll();
-}
-
+//-----------------------------------------------------------------------------
+// Display configuration setters
+//-----------------------------------------------------------------------------
 // View update helper
 void EventDisplay::UpdateViews() {
     auto* eventScene = m_eve->GetCurrentEvent();
@@ -312,6 +319,28 @@ void EventDisplay::UpdateViews() {
     m_eve->Redraw3D(kFALSE, kTRUE);
 }
 
+//-----------------------------------------------------------------------------
+// Navigation
+//-----------------------------------------------------------------------------
+// Go forward one spill
+void EventDisplay::NextSpill() {
+    if(m_currentSpill < m_spills.size() - 1) {
+        ++m_currentSpill;
+        DrawAll();
+    }
+}
+
+// Go back one spill
+void EventDisplay::PreviousSpill() {
+    if(m_currentSpill < m_spills.size() - 1) {
+        --m_currentSpill;
+        DrawAll();
+    }
+}
+
+//-----------------------------------------------------------------------------
+// Display configuration options
+//-----------------------------------------------------------------------------
 // Color management
 int EventDisplay::GetColor(int id) const {
     // Use ROOT's color wheel with 16-step repeating pattern
@@ -320,22 +349,6 @@ int EventDisplay::GetColor(int id) const {
     return baseColors[abs(id) % nColors];
 }
 
-// Navigation
-void EventDisplay::NextSpill() {
-    if(m_currentSpill < m_spills.size() - 1) {
-        ++m_currentSpill;
-        DrawAll();
-    }
-}
-
-void EventDisplay::PreviousSpill() {
-    if(m_currentSpill < m_spills.size() - 1) {
-        --m_currentSpill;
-        DrawAll();
-    }
-}
-
-// Configuration
 void EventDisplay::SetColorBySlice() {
     m_config.colorBySlice = true;
     m_config.colorByPFP = false;
@@ -363,7 +376,24 @@ void EventDisplay::SetPlaneVisibility(unsigned int id, bool enable) {
     LoadData();
 }
 
-// Getter Functions
+void EventDisplay::ToggleFlashes(bool enable) {
+    m_config.showFlashes = enable;
+    DrawAll();
+}
+
+void EventDisplay::ToggleCRTHits(bool enable) {
+    m_config.showCRT = enable;
+    DrawAll();
+}
+
+void EventDisplay::ToggleReco(bool enable) {
+    m_config.showReco = enable;
+    DrawAll();
+}
+
+//-----------------------------------------------------------------------------
+// Getter functions
+//-----------------------------------------------------------------------------
 int EventDisplay::GetCurrentRun() const { 
     return this->m_spills[this->m_currentSpill].run;
 }

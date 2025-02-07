@@ -1,8 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include <algorithm>  // For std::remove, std::remove_if
-#include <string>     // For std::string and std::getline
+#include <algorithm>
+#include <string> 
 
 // Helper function to extract cut definitions from cut_helper.h
 static std::vector<std::string> ExtractCuts(const std::string& cut_identifier) {
@@ -34,12 +34,12 @@ static std::vector<std::string> ExtractCuts(const std::string& cut_identifier) {
     return cuts;
 }
 
+// Extract slice cuts from the configuration file
 std::vector<std::string> SliceCuts() {
-    // Extract slice cuts from the configuration file
     return ExtractCuts("slice_cuts={");
 }
 
+// Extract spill cuts from the configuration file
 std::vector<std::string> SpillCuts() {
-    // Extract spill cuts from the configuration file
     return ExtractCuts("spill_cuts={");
 }
