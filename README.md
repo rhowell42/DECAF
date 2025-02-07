@@ -1,6 +1,8 @@
 # DECAF
 3D event display to work with CAF files in the SBN collaboration.
 
+![image](https://github.com/user-attachments/assets/472acd37-4ddc-4581-8214-5496b0f45c1d)
+
 ## Introduction
 This is a lightweight event display that runs on caf and flatcaf files from events generated in the ICARUS LArTPCs. The purpose of this event display is to provide a user-friendly debugging tool for neutrino/cosmic ray analyses and reconstruction efforts. It contains a click-and-drag rotatable, mouse wheel zoom and pan 3D display, selectable hit coloring options, and buttons for advancing to either the next spill in the CAF file or the previous one. It will also plot reconstructed tracks/showers as lines/cones respectively relate to their `pfp.trackScore`.
 
@@ -15,7 +17,7 @@ Some data events from run 7418 are available for you to check out here: `/icarus
    -N.B. You need version v09_58_02 or later.`
 4. Start your vncserver if you haven't already. Instructions for doing this [here](https://sbnsoftware.github.io/sbndcode_wiki/Viewing_events_remotely_with_VNC.html) if you haven't done this before.
 5. Add any slice and/or spill cuts you might want to select in the respective vectors in `cut_helper.h`
-6. Compile everything with `g++ -o event_display Display/MyMainFrame.cpp Display/EventDisplay.cpp event_display.C -I$SBNANA_INC -I$SBNANAOBJ_INC -I$SRPROXY_INC -L$SBNANA_LIB -L$SBNANAOBJ_LIB -L$SRPROXY_LIB -lCAFAnaCore -lCAFAnaVars $(root-config --cflags --libs) -lEG -lRHTTP -lGui`
+6. Compile everything with `g++ -o decaf Display/MyMainFrame.cpp Display/EventDisplay.cpp event_display.C -I$SBNANA_INC -I$SBNANAOBJ_INC -I$SRPROXY_INC -L$SBNANA_LIB -L$SBNANAOBJ_LIB -L$SRPROXY_LIB -lCAFAnaCore -lCAFAnaVars $(root-config --cflags --libs) -lEG -lRHTTP -lGui`
 7. `chmod +x decaf`
 8. `./decaf {path/to/your/file.caf.root}` 
 9. `cafe event_display.C "path/to/your/files*.caf.root" #If want to run over multiple files, add quotation marks around the argument`
@@ -27,28 +29,38 @@ If you want to save and display TPC hits, you will need your own copy of [cafmak
 
 **WARNING: These CAF files will be an order of magnitude larger in size than the normal CAFs. 100 data events will be ~300 MB in size.**
 
-### User Cuts
+### Navigation
+- Large 3D View
+  - Click and drag to rotate the camera around the center of the detector
+  - Click down the mouse scroll and drag to pan the camera over the scene, alternatively use arrow keys
+  - Scroll to zoom in and out
+- Two side projected views: front on and top down
+  - Click and drag to pan the camera, alternatively use arrow keys
+  - Scroll to zoom in and out
+
+### Event Navigation
+- Next Spill
+  - Draw the sequentially next spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
+- Previous Spill
+  - Draw the sequentially previous spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
+
+### Configuration Options
+#### User Cuts
 Add the slice and spill cuts you would like to optionally apply to `cut_helper.h`; there are two vectors, one for slice cuts and the other for spill cuts. Do not change the name of these vectors, but add your cuts to them in the same way the `kNoCut` are added. I would recommened adding an `#include your_cuts.h` statement to keep `cut_helper.h` visually clean, where `your_cuts.h` is where you actually define the cuts you use for you selection. These cuts will automatically be added to a drop-down text box in the event display where you can select any arbitrary combination of them to apply to the events displayed.
 
-### Drawing Options
+#### Drawing Options
 - Color by Slice
   - Color code the SRSpacePoints based one which SRSlice they belong to.
 - Color by PFP
   - Color code the SRSpacePoints based one which SRPFP they are reconstructed into
 
-### Plotting Options
+#### Plotting Options
 - Only Plot Nu Slice
   - Redraw the scene to only show slices that aren't identified by Pandora as "clear cosmic." Checking or unchecking this box will rerun the spectrum loader, so give it some time.
 - Apply Slice Cuts
   - Select the slice cuts you would like to apply in the drop-down text box, and hit the `Apply Slice Cuts` button. This will take some time as it reruns the spectrum loader.
 - Apply Spill Cuts
   - Select the slice cuts you would like to apply in the drop-down text box, and hit the `Apply Spill Cuts` button. This will take some time as it reruns the spectrum loader.
-  
-### Event Navigation
-- Next Spill
-  - Draw the sequentially next spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
-- Previous Spill
-  - Draw the sequentially previous spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
 
 ### TODO
 - Add CMake support to so the compile command isn't so cumbersome
