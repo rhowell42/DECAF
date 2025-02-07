@@ -10,12 +10,15 @@ Some data events from run 7418 are available for you to check out here: `/icarus
 
 ## How to Use
 ### Base Use
-1. `git clone https://github.com/rhowell42/DECAF.git` # On an ICARUS gpvm, go to your working area and clone this repository.
-3. `scripts/setup_online.sh` #Setup the relevant SBNSoftware/sbnana version `setup sbnana -v v09_58_02 -q e20:prof` 
-   -N.B. You need version v09_58_02 or later.
+1. `git clone https://github.com/rhowell42/DECAF.git # On an ICARUS gpvm, go to your working area and clone this repository.`
+3. `scripts/setup_online.sh #Setup the relevant SBNSoftware/sbnana version setup sbnana -v v09_58_02 -q e20:prof
+   -N.B. You need version v09_58_02 or later.`
 4. Start your vncserver if you haven't already. Instructions for doing this [here](https://sbnsoftware.github.io/sbndcode_wiki/Viewing_events_remotely_with_VNC.html) if you haven't done this before.
 5. Add any slice and/or spill cuts you might want to select in the respective vectors in `cut_helper.h`
-5. `cafe event_display.C {path/to/your/file.caf.root}` # Where you cloned the git repo. If want to run over multiple files, add quotation marks around the argument: `cafe event_display.C `"path/to/your/files*.caf.root"`
+6. Compile everything with `g++ -o event_display Display/MyMainFrame.cpp Display/EventDisplay.cpp event_display.C -I$SBNANA_INC -I$SBNANAOBJ_INC -I$SRPROXY_INC -L$SBNANA_LIB -L$SBNANAOBJ_LIB -L$SRPROXY_LIB -lCAFAnaCore -lCAFAnaVars $(root-config --cflags --libs) -lEG -lRHTTP -lGui`
+7. `chmod +x decaf`
+8. `./decaf {path/to/your/file.caf.root}` 
+9. `cafe event_display.C "path/to/your/files*.caf.root" #If want to run over multiple files, add quotation marks around the argument`
 
 ### Generate Your Own CAFs
 If you want to save and display TPC hits, you will need your own copy of [cafmakerjob_icarus.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus.fcl) ([cafmakerjob_icarus_data.fcl](https://github.com/SBNSoftware/icaruscode/blob/develop/fcl/caf/cafmakerjob_icarus_data.fcl) if you want to look at data). There you will add the line `cafmaker.FillHits: true` which will fill all of the SRHit and SRSpacePoint information needed to use the event display. Then run `lar -c cafmakerjob_icarus{_data}.fcl` as usual.
@@ -46,3 +49,11 @@ Add the slice and spill cuts you would like to optionally apply to `cut_helper.h
   - Draw the sequentially next spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
 - Previous Spill
   - Draw the sequentially previous spill in the CAF file. If Apply Spill Cuts is checked, the next spill will be the one that meets those spill cut requirements.
+
+### TODO
+- Add CMake support to so the compile command isn't so cumbersome
+- Fix applying slice cuts
+- Add ability for search
+  - User gives a prompt for a run and event number, take them to that event
+  - Needs support from SAM dev team to impliment an event catalogue
+- Remove need to store every single event from input data; run SpectrumLoader on single TTree event to save on memory usage (requires search functionality)
