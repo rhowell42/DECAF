@@ -17,7 +17,7 @@ Some data events from run 7418 are available for you to check out here: `/icarus
    -N.B. You need version v09_58_02 or later.`
 4. Start your vncserver if you haven't already. Instructions for doing this [here](https://sbnsoftware.github.io/sbndcode_wiki/Viewing_events_remotely_with_VNC.html) if you haven't done this before.
 5. Add any slice and/or spill cuts you might want to select in the respective vectors in `cut_helper.h`
-6. Compile everything with `g++ -o decaf Display/MyMainFrame.cpp Display/EventDisplay.cpp event_display.C -I$SBNANA_INC -I$SBNANAOBJ_INC -I$SRPROXY_INC -L$SBNANA_LIB -L$SBNANAOBJ_LIB -L$SRPROXY_LIB -lCAFAnaCore -lCAFAnaVars $(root-config --cflags --libs) -lEG -lRHTTP -lGui`
+6. Compile everything with `g++ -o decaf Display/MyMainFrame.cpp Display/EventDisplay.cpp event_display.C -I$SBNANA_INC -I$SBNANAOBJ_INC -l$SRPROXY_INC -L$SBNANA_LIB -L$SBNANAOBJ_LIB -lCAFAnaCore -lCAFAnaVars -lCAFAnaCuts -lSBNAnaCuts -lSBNAnaVars -lsbnanaobj_StandardRecordProxy $(root-config --cflags --libs) -lEG -lRHTTP -lGui -lEve -lGeom -lRGL`
 7. `chmod +x decaf`
 8. `./decaf {path/to/your/file.caf.root}` 
 9. `cafe event_display.C "path/to/your/files*.caf.root" #If want to run over multiple files, add quotation marks around the argument`
